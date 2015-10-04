@@ -1,0 +1,178 @@
+% This is "bach-ref-2009.tex" Updated january 29th 2010.
+% This file should be compiled with "sig-alternate-fixed.cls" January 2010.
+% It is based on the ACM style "sig-alternate.cls"
+% -------------------------------------------------------------------------
+% This example file demonstrates the use of the 'sig-alternate-fixed.cls'
+% V2.5 LaTeX2e document class file. It is for those submitting
+% articles to the Twente Student Conference on IT. Both this file as the 
+% document class file are based upon ACM documents.
+%
+% ----------------------------------------------------------------------------------------------------------------
+% This .tex file (and associated .cls) produces:
+%       1) The Permission Statement
+%       2) The Conference (location) Info information
+%       3) The Copyright Line TSConIT
+%       4) NO page numbers
+%       5) NO headers and/or footers
+%
+%
+% Using 'sig-alternate.cls' you have control, however, from within
+% the source .tex file, over both the CopyrightYear
+% (defaulted to 200X) and the ACM Copyright Data
+% (defaulted to X-XXXXX-XX-X/XX/XX).
+% e.g.
+% \CopyrightYear{2007} will cause 2007 to appear in the copyright line.
+% \crdata{0-12345-67-8/90/12} will cause 0-12345-67-8/90/12 to appear in the copyright line.
+%
+% ---------------------------------------------------------------------------------------------------------------
+% This .tex source is an example which *does* use
+% the .bib file (from which the .bbl file % is produced).
+% REMEMBER HOWEVER: After having produced the .bbl file,
+% and prior to final submission, you *NEED* to 'insert'
+% your .bbl file into your source .tex file so as to provide
+% ONE 'self-contained' source file.
+%
+
+% refers to the cls file being used
+\documentclass{sig-alternate-br}
+
+\begin{document}
+%
+% --- Author Metadata here --- DO NOT REMOVE OR CHANGE 
+\conferenceinfo{13$^{th}$ Twente Student Conference on IT}{June 21$^{st}$, 2010, Enschede, The Netherlands.}
+%\CopyrightYear{2010} % Allows default copyright year (200X) to be over-ridden - IF NEED BE.
+%\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+% --- End of Author Metadata ---
+
+\title{Edit distance problem on a GPU-cluster}
+% In Bachelor Referaat at University of Twente the use of a subtitle is discouraged.
+% \subtitle{[Instructions]}
+
+%
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+\numberofauthors{1} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% You can go ahead and credit any number of authors here,
+% e.g. one 'row of three' or two rows (consisting of one row of three
+% and a second row of one, two or three).
+%
+% The command \alignauthor (no curly braces needed) should
+% precede each author name, affiliation/snail-mail address and
+% e-mail address. Additionally, tag each line of
+% affiliation/address with \affaddr, and tag the
+% e-mail address with \email.
+%
+% 1st. author
+\alignauthor Antoine Veenstra\\
+       \affaddr{University of Twente}\\
+       \affaddr{P.O. Box 217, 7500AE Enschede}\\
+       \affaddr{The Netherlands}\\
+       \email{a.j.veenstra@student.utwente.nl}
+% 2nd. author
+\alignauthor 2nd Author\\
+       \affaddr{2nd author's affiliation}\\
+       \affaddr{1st line of address}\\
+       \affaddr{2nd line of address}\\
+       \email{2nd author's email address}
+% 3rd. author
+\alignauthor 3rd Author\\
+       \affaddr{3rd author's affiliation}\\
+       \affaddr{1st line of address}\\
+       \affaddr{2nd line of address}\\
+       \email{3rd author's email address}
+}
+% There's nothing stopping you putting the seventh, eighth, etc.
+% author on the opening page (as the 'third row') but we ask,
+% for aesthetic reasons that you place these 'additional authors'
+% in the \additional authors block, viz.
+\additionalauthors{Additional authors: John Smith (The
+Th{\o}rv{\"a}ld Group, email: {\texttt{jsmith@affiliation.org}})
+and Julius P.~Kumquat (The Kumquat Consortium, email:
+{\texttt{jpkumquat@consortium.net}}).}
+\date{30 July 1999}
+% Just remember to make sure that the TOTAL number of authors
+% is the number that will appear on the first page PLUS the
+% number that will appear in the \additionalauthors section.
+
+\maketitle
+\begin{abstract}
+In this paper, we describe how the edit distance problem can be distributed over a GPU-cluster using MPI.  
+\end{abstract}
+
+% A category with the (minimum) three required fields (NOT USED in Bachelor Referaat)
+% \category{H.4}{Information Systems Applications}{Miscellaneous}
+%A category including the fourth, optional field follows...
+% \category{D.2.8}{Software Engineering}{Metrics}[complexity
+% measures, performance measures]
+
+\keywords{OpenCL, Edit distance problem, GPU-cluster, C++, case study, GPGPU program, MPI, Message Passing Interface, case study}
+
+\section{Introduction}
+As the amount of data increases the need for parallel does so too. The edit distance problem is used in various fields of research\cite{Navarro:2001:GTA:375360.375365}. Fields such as Computational Biology, Signal Processing, and Text Retrieval.
+This algorithm has already been implemented on a single Graphics Processing Unit (GPU)\cite{Heus:GPGPU}, but to decrease the processing time even further a logical step is to increase the number of GPUs\cite{Farivar2012}.
+These GPUs allow the processing of larger amounts of data in parallel than is possible in 
+
+The existing implementation of this problem uses a dynamic programming algorithm, which is well-suited for 
+
+How will the proposed implementation improve performance?
+
+\section{Research questions}
+The research question of this proposal is:
+
+How much can the processing time needed to calculate the edit distance problem be reduced using a GPU cluster which uses MPI?
+
+
+
+\section{Background}
+\subsection{OpenCL}
+
+\subsection{GPGPU programming}
+\subsection{MPI}
+\subsection{Edit distance}
+The edit distance problem is way of measuring how much two strings differ from each other. The distance between two strings is measured by inserting, removing, and rearanging characters. The operations considered 
+\section{Related work}
+\subsection{Edit distance problem on GPU}
+\subsection{Benchmark on a GPU-cluster}
+\section{Method}
+
+
+
+\section{Conclusions}
+
+
+\section{Acknowledgments}
+
+%\balancecolumns
+%\newpage
+
+\bibliographystyle{abbrv}
+\bibliography{sigproc}
+
+
+\end{document}
