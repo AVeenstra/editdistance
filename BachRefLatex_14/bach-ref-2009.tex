@@ -39,12 +39,12 @@
 \begin{document}
 %
 % --- Author Metadata here --- DO NOT REMOVE OR CHANGE 
-\conferenceinfo{13$^{th}$ Twente Student Conference on IT}{June 21$^{st}$, 2010, Enschede, The Netherlands.}
+\conferenceinfo{23$^{th}$ Twente Student Conference on IT}{June 22$^{nd}$, 2016, Enschede, The Netherlands.}
 %\CopyrightYear{2010} % Allows default copyright year (200X) to be over-ridden - IF NEED BE.
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
 % --- End of Author Metadata ---
 
-\title{Edit distance problem on a GPU-cluster}
+\title{Edit distance on GPU clusters using MPI}
 % In Bachelor Referaat at University of Twente the use of a subtitle is discouraged.
 % \subtitle{[Instructions]}
 
@@ -95,27 +95,27 @@
        \affaddr{The Netherlands}\\
        \email{a.j.veenstra@student.utwente.nl}
 % 2nd. author
-\alignauthor 2nd Author\\
-       \affaddr{2nd author's affiliation}\\
-       \affaddr{1st line of address}\\
-       \affaddr{2nd line of address}\\
-       \email{2nd author's email address}
+%\alignauthor 2nd Author\\
+%      \affaddr{2nd author's affiliation}\\
+%      \affaddr{1st line of address}\\
+%      \affaddr{2nd line of address}\\
+%      \email{2nd author's email address}
 % 3rd. author
-\alignauthor 3rd Author\\
-       \affaddr{3rd author's affiliation}\\
-       \affaddr{1st line of address}\\
-       \affaddr{2nd line of address}\\
-       \email{3rd author's email address}
+%\alignauthor 3rd Author\\
+%      \affaddr{3rd author's affiliation}\\
+%      \affaddr{1st line of address}\\
+%      \affaddr{2nd line of address}\\
+%      \email{3rd author's email address}
 }
 % There's nothing stopping you putting the seventh, eighth, etc.
 % author on the opening page (as the 'third row') but we ask,
 % for aesthetic reasons that you place these 'additional authors'
 % in the \additional authors block, viz.
-\additionalauthors{Additional authors: John Smith (The
-Th{\o}rv{\"a}ld Group, email: {\texttt{jsmith@affiliation.org}})
-and Julius P.~Kumquat (The Kumquat Consortium, email:
-{\texttt{jpkumquat@consortium.net}}).}
-\date{30 July 1999}
+%\additionalauthors{Additional authors: John Smith (The
+%Th{\o}rv{\"a}ld Group, email: {\texttt{jsmith@affiliation.org}})
+%and Julius P.~Kumquat (The Kumquat Consortium, email:
+%{\texttt{jpkumquat@consortium.net}}).}
+%\date{30 July 1999}
 % Just remember to make sure that the TOTAL number of authors
 % is the number that will appear on the first page PLUS the
 % number that will appear in the \additionalauthors section.
@@ -135,38 +135,89 @@ In this paper, we describe how the edit distance problem can be distributed over
 
 \section{Introduction}
 As the amount of data increases the need for parallel does so too. The edit distance problem is used in various fields of research\cite{Navarro:2001:GTA:375360.375365}. Fields such as Computational Biology, Signal Processing, and Text Retrieval.
-This algorithm has already been implemented on a single Graphics Processing Unit (GPU)\cite{Heus:GPGPU}, but to decrease the processing time even further a logical step is to increase the number of GPUs\cite{Farivar2012}.
-These GPUs allow the processing of larger amounts of data in parallel than is possible in 
+This algorithm has already been implemented on a single Graphics Processing Unit (GPU)\cite{Heus:GPGPU}, but to decrease the processing time even further a logical step is to increase the number of GPUs\cite{Cluster}.
+These GPUs allow the processing of larger amounts of data in parallel than is possible on a CPU. 
 
-The existing implementation of this problem uses a dynamic programming algorithm, which is well-suited for 
+The existing implementation of the edit distance problem uses a dynamic programming algorithm, which is well-suited for general-purpose computing on graphics processing units (GPGPU).
+The implementation was written in C++ using OpenCL which can run on both NVIDIA and AMD GPUs.
+An alternative would have been CUDA, which has been developed by NVIDIA and runs exclusively on NVIDIA GPUs.
+OpenCL has been and will be chosen over CUDA to guarantee compatibility with both types of GPUs.
 
-How will the proposed implementation improve performance?
+To allow interaction between devices in a cluster a protocol is required. One standard which has been around for years is the Message Passing Interface (MPI).
+This interface will be used to distribute the algorithm on multiple (multi-)GPU nodes.
+A successful program using MPI and OpenCL has already been made\cite{Cluster}. 
+
+By implementing the edit distance problem on a GPU-cluster instead of a single GPU the processing time could be reduced as the performance of a cluster exceeds that of a single unit\cite{Cluster}.
+The goal of the research described in this paper is to implement the edit distance problem on a GPU-cluster using MPI.
+This goal gives us the research question mentioned in the following section.
 
 \section{Research questions}
 The research question of this proposal is:
 
 How much can the processing time needed to calculate the edit distance problem be reduced using a GPU cluster which uses MPI?
 
-
+A possible division in subquestions is:
+\begin{enumerate}
+    \item How can the algorithm be divided in separate processes?
+    \item How can the algorithm be run on multiple devices using MPI?
+    \item What is the optimal number of GPUs when considering cost and efficiency?
+\end{enumerate}
 
 \section{Background}
 \subsection{OpenCL}
+OpenCL is a programming language which allows a developer to run a kernel on a GPU or CPU\cite{OpenCL}.
+It is a low level programming language which can run on most GPUs and CPUs and allows general purpose parallel programming across both CPUs and GPUs.
+The traditional CPU-based programming models do not allow the same complex vector operations as OpenCL offers without the need to translate their algorithms to a 3D graphics API such as OpenGL.
+As mentioned before OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs\cite{CUDA}.
 
 \subsection{GPGPU programming}
+GPGPU programming is the use of GPUs to handle computation which traditionally is done by CPUs.
+The number of cores on a GPU is generally much higher than a CPU has, so a GPU can process more data in parallel.
+OpenCL loads a kernel on every OpenCL device and a host program manages the execution of the kernels.
+After a kernel has finished running the results are returned to the host program.
+The kernel on every core is the same, so the only way to change the outcome of the program is to modify the input of the program.
+
 \subsection{MPI}
+MPI is a standard specification in communication between computers which enables parallel computing.
+
+
 \subsection{Edit distance}
-The edit distance problem is way of measuring how much two strings differ from each other. The distance between two strings is measured by inserting, removing, and rearanging characters. The operations considered 
+The edit distance problem is way of measuring how much two strings differ from each other.
+The distance between two strings is measured by operations like inserting, removing, replacing, and rearranging characters.
+The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
+For this project only inserting, removing, and replacing are considered.
+These operations costs are $C_i$ (insertion), $C_d$ (deletion), and $C_r$ (replacement) for each operation is variable.
+
+An example input is:
+\begin{align*}
+S_1 &= \text{Saturday}\\
+S_2 &= \text{Sunday}\\
+C_i &= 2\\
+C_d &= 3\\
+C_r &= 6
+\end{align*}
+With this given input the output of the program should be $11$.
+
 \section{Related work}
 \subsection{Edit distance problem on GPU}
 \subsection{Benchmark on a GPU-cluster}
 \section{Method}
-
-
+The research question is best answered with a comparison in time needed to compute the edit distance.
+One possible way to measure the difference in time required is to calculate the edit distance of two large strings, possibly DNA sequences, is to calculate it on every node of the cluster individually and then as a cluster working together.
+The average time every individual node requires can then be compared to the time taken by the cluster.
+This test should be repeated with different sizes of clusters and different types of nodes to obtain reliable and realistic results.
 
 \section{Conclusions}
+The possible answers to the research question can be divided in different ranges.
+The first range is a negative time difference, which indicates the use of MPI, dividing the algorithm, or the use of a cluster in general is inefficient.
 
+The next range is a difference almost equal to zero, which indicates that dividing the calculation gives too much overhead, leaving no room for significant improvements.
 
-\section{Acknowledgments}
+The third range is a difference up to $n$ times as fast as the single node implementation, where $n$ is the number of nodes in the cluster.
+This would mean that dividing the computation over a cluster is more efficient than calculating it on a single node, but that the overhead still impacts the performance of the algorithm.
+My hypothesis is that the result will be in this range.
+
+The last range is the most improbable. It ranges from $n$ times as fast to infinity as fast, where $n$ is the number of nodes. This would mean that the algorithm is more efficient as it is divided 
 
 %\balancecolumns
 %\newpage
