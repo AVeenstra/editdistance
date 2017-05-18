@@ -106,15 +106,14 @@ int main(int argc, char* argv[])
 		cout << "No GPU device available." << endl;
 		cout << "Choose CPU as default device." << endl;
 		status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 0, NULL, &numDevices);	
-		if(status != CL_SUCCESS) 
-   	{ 
+		if(status != CL_SUCCESS) { 
         	std::cout << "Error: device error. \n";
         	return 0;
     	}
 		devices = (cl_device_id*)malloc(numDevices * sizeof(cl_device_id));
 		status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, numDevices, devices, NULL);
 		if(status != CL_SUCCESS) 
-   	{ 
+		{ 
         	std::cout << "Error: device error2. \n";
         	return 0;
     	}
@@ -124,7 +123,7 @@ int main(int argc, char* argv[])
 		devices = (cl_device_id*)malloc(numDevices * sizeof(cl_device_id));
 		status = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, numDevices, devices, NULL);
 		if(status != CL_SUCCESS) 
-   	{ 
+		{ 
         	std::cout << "Error: device error 3. \n";
         	return 0;
     	}
