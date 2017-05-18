@@ -1,35 +1,42 @@
 \begin{thebibliography}{1}
 
-\bibitem{bowman:reasoning}
-M.~Bowman, S.~K. Debray, and L.~L. Peterson.
-\newblock Reasoning about naming systems.
-\newblock {\em ACM Trans. Program. Lang. Syst.}, 15(5):795--825, November 1993.
+\bibitem{Heus:GPGPU}
+S.~de~Heus.
+\newblock {A Case Study for GPGPU Program Verification}.
+\newblock
+  \url{http://referaat.cs.utwente.nl/conference/20/paper/7428/a-case-study-for-gpgpu-program-verification.pdf}.
 
-\bibitem{braams:babel}
-J.~Braams.
-\newblock Babel, a multilingual style-option system for use with latex's
-  standard document styles.
-\newblock {\em TUGboat}, 12(2):291--301, June 1991.
+\bibitem{Cluster}
+G.~Jo, J.~Nah, J.~Lee, J.~Kim, and J.~Lee.
+\newblock {Accelerating LINPACK with MPI-OpenCL on Clusters of Multi-GPU
+  Nodes}.
+\newblock {\em IEEE Transactions on Parallel and Distributed Systems},
+  26(7):1814--1825, 2014.
 
-\bibitem{clark:pct}
-M.~Clark.
-\newblock Post congress tristesse.
-\newblock In {\em TeX90 Conference Proceedings}, pages 84--89. TeX Users Group,
-  March 1991.
+\bibitem{Kronos:conformant}
+{Kronos Group}.
+\newblock Conformant products.
+\newblock
+  \url{https://www.khronos.org/conformance/adopters/conformant-products#opencl}.
 
-\bibitem{herlihy:methodology}
-M.~Herlihy.
-\newblock A methodology for implementing highly concurrent data objects.
-\newblock {\em ACM Trans. Program. Lang. Syst.}, 15(5):745--770, November 1993.
+\bibitem{OpenCL}
+A.~Munshi.
+\newblock {\em The OpenCL Specification}.
+\newblock Khronos OpenCL Working Group, November 2012.
 
-\bibitem{Lamport:LaTeX}
-L.~Lamport.
-\newblock {\em LaTeX User's Guide and Document Reference Manual}.
-\newblock Addison-Wesley Publishing Company, Reading, Massachusetts, 1986.
+\bibitem{Navarro:2001:GTA:375360.375365}
+G.~Navarro.
+\newblock A guided tour to approximate string matching.
+\newblock {\em ACM Comput. Surv.}, 33(1):31--88, Mar. 2001.
 
-\bibitem{salas:calculus}
-S.~Salas and E.~Hille.
-\newblock {\em Calculus: One and Several Variable}.
-\newblock John Wiley and Sons, New York, 1978.
+\bibitem{CUDA}
+{NVIDIA Corporation}.
+\newblock {CUDA GPUs}.
+\newblock \url{https://developer.nvidia.com/cuda-gpus}, October 2015.
+
+\bibitem{MPI}
+{University of Tennessee, Knoxville, Tennessee}.
+\newblock Mpi : A message-passing interface standard.
+\newblock \url{http://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf}.
 
 \end{thebibliography}

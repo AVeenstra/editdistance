@@ -122,7 +122,8 @@
 
 \maketitle
 \begin{abstract}
-In this paper, we describe how the edit distance problem can be distributed over a GPU-cluster using MPI.  
+In this paper, we describe how the edit distance problem can be distributed over a GPU-cluster using MPI and OpenCL.
+The performance of the cluster will then be compared to that of a single device.
 \end{abstract}
 
 % A category with the (minimum) three required fields (NOT USED in Bachelor Referaat)
@@ -134,16 +135,19 @@ In this paper, we describe how the edit distance problem can be distributed over
 \keywords{OpenCL, Edit distance problem, GPU-cluster, C++, case study, GPGPU program, MPI, Message Passing Interface, case study}
 
 \section{Introduction}
-As the amount of data increases the need for parallel does so too. The edit distance problem is used in various fields of research\cite{Navarro:2001:GTA:375360.375365}. Fields such as Computational Biology, Signal Processing, and Text Retrieval.
+As the amount of data increases the need for parallel computation does so too.
+The edit distance problem is used in various fields of research\cite{Navarro:2001:GTA:375360.375365}.
+Fields such as Computational Biology, Signal Processing, and Text Retrieval.
 This algorithm has already been implemented on a single Graphics Processing Unit (GPU)\cite{Heus:GPGPU}, but to decrease the processing time even further a logical step is to increase the number of GPUs\cite{Cluster}.
 These GPUs allow the processing of larger amounts of data in parallel than is possible on a CPU. 
 
 The existing implementation of the edit distance problem uses a dynamic programming algorithm, which is well-suited for general-purpose computing on graphics processing units (GPGPU).
 The implementation was written in C++ using OpenCL which can run on both NVIDIA and AMD GPUs.
 An alternative would have been CUDA, which has been developed by NVIDIA and runs exclusively on NVIDIA GPUs.
-OpenCL has been and will be chosen over CUDA to guarantee compatibility with both types of GPUs.
+OpenCL has been and will be chosen over CUDA in order to ensure compatibility with most types of GPUs.
 
-To allow interaction between devices in a cluster a protocol is required. One standard which has been around for years is the Message Passing Interface (MPI).
+To allow interaction between devices in a cluster a protocol is required.
+One standard which has been around for years is the Message Passing Interface (MPI)\cite{MPI}.
 This interface will be used to distribute the algorithm on multiple (multi-)GPU nodes.
 A successful program using MPI and OpenCL has already been made\cite{Cluster}. 
 
@@ -178,11 +182,14 @@ After a kernel has finished running the results are returned to the host program
 The kernel on every core is the same, so the only way to change the outcome of the program is to modify the input of the program.
 
 \subsection{MPI}
-MPI is a standard specification in communication between computers which enables parallel computing.
-
+MPI is a standard specification in communication between computers which enables parallel computing\cite{MPI}.
+An implementation of specification is freely available and will be used in this project.
+The implementation allows the transmission of multiple datatypes and messages between nodes.
+It also provides a way to identify all the connected processes and assign an identifier to each process.
+These features could help dividing the workload over all nodes.
 
 \subsection{Edit distance}
-The edit distance problem is way of measuring how much two strings differ from each other.
+The edit distance problem is way of measuring how much two strings differ from each other\cite{Navarro:2001:GTA:375360.375365}.
 The distance between two strings is measured by operations like inserting, removing, replacing, and rearranging characters.
 The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
 For this project only inserting, removing, and replacing are considered.
@@ -196,16 +203,32 @@ C_i &= 2\\
 C_d &= 3\\
 C_r &= 6
 \end{align*}
-The output of the program should be $11$.
+With this given input the output of the program should be $11$.
 
 \section{Related work}
 \subsection{Edit distance problem on GPU}
+As mentioned before the edit distance problem has already been implemented on a single GPU\cite{Heus:GPGPU}. This implementation also uses the operations insert, delete, and replace. This implementation will be improved if necessary and will probably be the base of the future implementation.
+
 \subsection{Benchmark on a GPU-cluster}
+This is an MPI-OpenCL implementation of the LINPACK benchmark which was run on a cluster containing 49 nodes, each node containing two eight-core CPUs and four GPUs\cite{i}.
+The implementation achieves 93.69 Tflops, which is 46 percent of the theoretical peak.
+It shows a successful implementation of MPI in combination with OpenCl, which is required in the future implementation of the edit distance algorithm.
+
 \section{Method}
 The research question is best answered with a comparison in time needed to compute the edit distance.
 One possible way to measure the difference in time required is to calculate the edit distance of two large strings, possibly DNA sequences, is to calculate it on every node of the cluster individually and then as a cluster working together.
 The average time every individual node requires can then be compared to the time taken by the cluster.
 This test should be repeated with different sizes of clusters and different types of nodes to obtain reliable and realistic results.
+
+One thing to consider is how to distribute the two strings, especially if they are quite large. A few distribution methods are:
+\begin{enumerate}
+    \item Saving the strings on the nodes before execution.
+    \item Choosing a master node which distributes the string to its slave nodes.
+    \item Hosting the strings on a separate server which does not take part in calculation of the edit distance.
+\end{enumerate}
+Options two and three are the most realistic options, as the distribution of the data would be part of the processing time. Option one on the other hand reduces the bottleneck create by the reading speed of the storage device, which allows comparison of the speed without taking into account the hardware storing the strings.
+
+Option three will probably be used, since a device uploading the strings to a cluster could be a real live situation.
 
 \section{Conclusions}
 The possible answers to the research question can be divided in different ranges.
@@ -217,7 +240,10 @@ The third range is a difference up to $n$ times as fast as the single node imple
 This would mean that dividing the computation over a cluster is more efficient than calculating it on a single node, but that the overhead still impacts the performance of the algorithm.
 My hypothesis is that the result will be in this range.
 
-The last range is the most improbable. It ranges from $n$ times as fast to infinity as fast, where $n$ is the number of nodes. This would mean that the algorithm is more efficient as it is divided 
+The last range is the most improbable. It ranges from $n$ times as fast to infinity as fast, where $n$ is the number of nodes.
+This would mean that the algorithm is more efficient as it is divided on multiple computers.
+If, for example, the number of nodes is doubled the speed would more than double.
+This would be strange since the processing power does not double.
 
 %\balancecolumns
 %\newpage

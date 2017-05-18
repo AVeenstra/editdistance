@@ -35,7 +35,6 @@
 
 % refers to the cls file being used
 \documentclass{sig-alternate-br}
-\usepackage{url}
 
 \begin{document}
 %
@@ -43,7 +42,7 @@
 \conferenceinfo{24$^{th}$ Twente Student Conference on IT}{January 
 %22$^{nd}$
 , 2016, Enschede, The Netherlands.}
-\CopyrightYear{2015} % Allows default copyright year (200X) to be over-ridden - IF NEED BE.
+%\CopyrightYear{2010} % Allows default copyright year (200X) to be over-ridden - IF NEED BE.
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
 % --- End of Author Metadata ---
 
@@ -125,7 +124,7 @@
 
 \maketitle
 \begin{abstract}
-In this paper, we describe the steps required to distribute a verified implementation of the edit distance problem on a GPU over a GPU-cluster using MPI and OpenCL.
+In this paper, we describe how a verified implementation of the edit distance problem can be distributed over a GPU-cluster using MPI and OpenCL.
 The new implementation will be verified too and the performance of the cluster will then be compared to that of a single device.
 \end{abstract}
 
@@ -135,95 +134,73 @@ The new implementation will be verified too and the performance of the cluster w
 % \category{D.2.8}{Software Engineering}{Metrics}[complexity
 % measures, performance measures]
 
-\keywords{OpenCL, Edit distance problem, GPU-cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}
+\keywords{OpenCL, Edit distance problem, GPU-cluster, C++, case study, GPGPU program, MPI, Message Passing Interface, case study}
 
 \section{Introduction}
 As the amount of data increases the need for parallel computation does so too, but this is no small feat.
-Multiple ways exist to process data in parallel, but one of the most efficient ways to do this is to use the Graphical Processing Unit (GPU).
-A GPU enables the parallel execution of a single operation on multiple variables, unlike the Common Processing Unit (CPU) which only allows for the execution of a single operation on a single value.
-Even if the CPU has multiple cores the amount of data processed in parallel is generally still inferior to that of a GPU.
+To guarantee 
 
-To decrease the processing time even further a logical step is to increase the number of GPUs \cite{Cluster}.
-One could add more GPUs to their computer, but this is not a scalable solution since most motherboards only support a limited amount of GPUs.
-Another solution would be to make multiple devices work together, each containing at least one GPU.
-This is called a GPU-cluster.
 
-Various algorithms have already been implemented on a single GPU device and were verified \cite{Heus:GPGPU}.
-The verification of a program is important since it can guarantee the result of an algorithm is always correct without fail.
-If one wants to distribute a verified implementation over multiple nodes some steps have to be taken to ensure the implementation is still mathematically correct.
-Those steps will be explored while distributing a verified implementation of the edit distance problem.
 
-The edit distance problem is used in various fields of research \cite{Navarro:2001:GTA:375360.375365}.
+
+The edit distance problem is used in various fields of research\cite{Navarro:2001:GTA:375360.375365}.
 Fields such as Computational Biology, Signal Processing, and Text Retrieval.
-It is used to compare two strings or sequences of data, such as genome sequences.
+This algorithm has already been implemented on a single Graphics Processing Unit (GPU)\cite{Heus:GPGPU}, but to decrease the processing time even further a logical step is to increase the number of GPUs\cite{Cluster}.
+These GPUs allow the processing of larger amounts of data in parallel than is possible on a CPU. 
 
-The existing implementation of the edit distance problem uses a dynamic programming algorithm, which is well-suited for general-purpose computing on GPUs (GPGPU).
-The implementation was written in C++ using OpenCL, which can run on most GPUs \cite{Kronos:conformant}.
-An alternative for OpenCL would have been CUDA, which has been developed by NVIDIA and runs exclusively on NVIDIA GPUs.
+The existing implementation of the edit distance problem uses a dynamic programming algorithm, which is well-suited for general-purpose computing on graphics processing units (GPGPU).
+The implementation was written in C++ using OpenCL which can run on both NVIDIA and AMD GPUs.
+An alternative would have been CUDA, which has been developed by NVIDIA and runs exclusively on NVIDIA GPUs.
 OpenCL has been and will be chosen over CUDA in order to ensure compatibility with most GPUs.
 
 To allow interaction between devices in a cluster a protocol is required.
-One standard which has been around for years is the Message Passing Interface (MPI) \cite{MPI}.
+One standard which has been around for years is the Message Passing Interface (MPI)\cite{MPI}.
 This interface will be used to distribute the algorithm on multiple (multi-)GPU nodes.
-A successful program using MPI and OpenCL has already been made \cite{Cluster}, so it might be possible to make a MPI-OpenCL implementation of the edit distance problem.
+A successful program using MPI and OpenCL has already been made\cite{Cluster}, so it might be possible to make a MPI-OpenCL implementation of the edit distance problem.
 
-By implementing the edit distance problem on a GPU-cluster instead of a single GPU the processing time could be reduced as the performance of a cluster exceeds that of a single unit \cite{Cluster}.
-The goal of this research is to implement the edit distance problem on a GPU-cluster using MPI and verify this implementation.
+By implementing the edit distance problem on a GPU-cluster instead of a single GPU the processing time could be reduced as the performance of a cluster could exceeds that of a single unit\cite{Cluster}.
+The goal of the research described in this paper is to implement the edit distance problem on a GPU-cluster using MPI.
 This goal gives us the research question mentioned in the following section.
 
 \section{Research questions}
 The research question of this proposal is:
 
-What are the steps required to distribute a verified implementation of an algorithm on a GPU-cluster?
+How much can the processing time needed to calculate the edit distance problem be reduced using a GPU cluster which uses MPI?
 
 A possible division in subquestions is:
 \begin{enumerate}
     \item How can the algorithm be divided in separate processes?
     \item How can the algorithm be run on multiple devices using MPI?
-    \item How can the verification of the implementation be guaranteed?
-    \item What is the optimal number of GPUs when considering cost, efficiency, and the amount of data compared?
+    \item What is the optimal number of GPUs when considering cost and efficiency?
 \end{enumerate}
 
 \section{Background}
 \subsection{OpenCL}
-GPGPU programming is the use of GPUs to handle computation which traditionally is done by CPUs.
-A CPU consists of one or more cores allowing single instructions streams and a single data stream (SISD).
-A GPU on the other hand has a Single Instruction stream and Multiple Data streams (SIMD).
-The number of cores on a GPU is generally much higher than a CPU has, so a GPU can process more data in parallel using its SIMD architecture.
-
-One programming language allowing the developer to run programs on a GPU is OpenCL.
-OpenCL allows a developer to run a kernel on a GPU or CPU \cite{OpenCL}.
+OpenCL is a programming language which allows a developer to run a kernel on a GPU or CPU\cite{OpenCL}.
 It is a low level programming language which can run on most GPUs and CPUs and allows general purpose parallel programming across both CPUs and GPUs.
 The traditional CPU-based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3D graphics API such as OpenGL.
-As mentioned before OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs \cite{CUDA}.
+As mentioned before OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs\cite{CUDA}.
 
-In the OpenCL architecture one CPU-based program called the "Host" controls multiple GPUs and CPUs called "Compute Devices".
-Each of those compute devices consist of one or more "Compute Units", which each contain one or more "Processing Elements".
-These processing elements execute the OpenCL kernels provided by the host program.
-After such kernel has finished running the results are returned to the host program.
-The kernel on every processing element is the same, so the only way to change the outcome of the program is to modify the input of the program \cite{OpenCL}.
-
-The memory hierarchy used in OpenCL is not equal to that of the physical memory configuration on GPUs.
-This is to prevent having to take into account every type of architecture, which would be tedious work as the amount of types is quite large.
-Each of the architectural devices discussed above have their own memory, which is inaccessible to components of the same type.
-Every processing element can access its own private memory, the memory of its compute unit, the memory of its compute device.
-The host memory can be accessed, but it is generally slower than the on-board memory \cite{OpenCL}.
-
-The architecture and memory hierarchy already enforce the division of the algorithm if one wants to use every component of a GPU.
+\subsection{GPGPU programming}
+GPGPU programming is the use of GPUs to handle computation which traditionally is done by CPUs.
+The number of cores on a GPU is generally much higher than a CPU has, so a GPU can process more data in parallel.
+OpenCL loads a kernel on every OpenCL device and a host program manages the execution of the kernels.
+After a kernel has finished running the results are returned to the host program.
+The kernel on every core is the same, so the only way to change the outcome of the program is to modify the input of the program.
 
 \subsection{MPI}
-MPI is a standard specification in communication between computers which enables parallel computing.
-An implementation of this specification is freely available and will be used in this project.
+MPI is a standard specification in communication between computers which enables parallel computing\cite{MPI}.
+An implementation of specification is freely available and will be used in this project.
 The implementation allows the transmission of multiple datatypes and messages between nodes.
-It also provides a way to identify all the connected processes and assign an identifier to each process \cite{MPI}.
+It also provides a way to identify all the connected processes and assign an identifier to each process.
 These features could help dividing the workload over all nodes.
 
 \subsection{Edit distance}
-The edit distance problem is way of measuring how much two strings differ from each other \cite{Navarro:2001:GTA:375360.375365}.
-The distance is measured by operations like inserting, removing, replacing, and rearranging characters.
+The edit distance problem is way of measuring how much two strings differ from each other\cite{Navarro:2001:GTA:375360.375365}.
+The distance between two strings is measured by operations like inserting, removing, replacing, and rearranging characters.
 The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
 For this project only inserting, removing, and replacing are considered.
-The operations costs are $C_i$ (insertion), $C_d$ (deletion), and $C_r$ (replacement).
+These operations costs are $C_i$ (insertion), $C_d$ (deletion), and $C_r$ (replacement) for each operation is variable.
 
 An example input is:
 \begin{align*}
@@ -231,40 +208,13 @@ S_1 &= \text{Saturday}\\
 S_2 &= \text{Sunday}\\
 C_i &= 2\\
 C_d &= 3\\
-C_r &= 4
+C_r &= 6
 \end{align*}
-
-A possible shortest path is:
-
-\begin{center}
-\begin{tabular}{rr}
-\textbf{Step} & \textbf{Cost} \\ \hline
-Saturday & \\
-Sturday & 3\\
-Surday  & 3\\
-Sunday  & 4\\ \hline
-Total:  & 10\\
-\end{tabular}
-\end{center}
-
-With this given input the output of the program should be $10$.
+With this given input the output of the program should be $11$.
 
 \section{Method}
-The research question is best answered by distributing an verified implementation over a GPU-cluster.
-By answering every subquestion the steps required to answer the main research question should be described.
-
-The first subquestion can be answered by proving mathematically that such a division of the algorithm is possible.
-An implementation could further proof the correct division of the algorithm.
-
-The next subquestion can be answered by searching for examples of such implementations.
-After that the implementation answering the previous subquestion could be expanded using MPI.
-
-The subquestion after that is best answered by describing the steps required to keep the implementation verified during the previous two subquestions.
-After this question has been answered the main question could be considered to be answered, but an GPU-cluster-based implementation is no good if the performance is inferior to an single GPU based implementation.
-Answering the next subquestion could show the performance difference of both implementations.
-
-The last subquestions can be answered by testing.
-One possible way to measure the difference in time required to calculate the edit distance of two large strings, possibly DNA sequences, is to calculate it on every node of the cluster individually and then as a cluster working together.
+The research question is best answered with a comparison in time needed to compute the edit distance.
+One possible way to measure the difference in time required is to calculate the edit distance of two large strings, possibly DNA sequences, is to calculate it on every node of the cluster individually and then as a cluster working together.
 The average time every individual node requires can then be compared to the time taken by the cluster.
 This test should be repeated with different sizes of clusters and different types of nodes to obtain reliable and realistic results.
 
@@ -278,36 +228,32 @@ Options two and three are the most realistic options, as the distribution of the
 
 Option three will probably be used, since a device uploading the strings to a cluster could be a real live situation.
 
-\section{Expected results}
-As only the answer of subquestion 4 will consist of tests only the expected results of these tests will be discussed.
-When comparing different cluster sizes, and lengths of data, the time required to compute the edit distance can be used to define most efficient setup.
-For each cluster size and data length the computation time can be divided in four ranges.
-
+\section{Conclusions}
+The possible answers to the research question can be divided in different ranges.
 The first range is a negative time difference, which indicates the use of MPI, dividing the algorithm, or the use of a cluster in general is inefficient.
 
 The next range is a difference almost equal to zero, which indicates that dividing the calculation gives too much overhead, denying any reduction of the processing time required.
 
 The third range is a difference up to $n$ times as fast as the single node implementation, where $n$ is the number of nodes in the cluster.
 This would mean that dividing the computation over a cluster is more efficient than calculating it on a single node, but that the overhead caused by the distribution of the algorithm impacts the performance.
-The distribution of algorithms over a GPU-cluster have already shown improved performances, so I suspect to have some setups to be within this range.
+The distribution of algorithms over a GPU-cluster have already shown improved performances, so I suspect the result to be within this range.
 
-The last range is the most improbable. It ranges from $n$ times as fast to beyond, where $n$ is the number of nodes.
+The last range is the most improbable. It ranges from $n$ times as fast to infinity times as fast, where $n$ is the number of nodes.
 This would mean that the algorithm is more efficient as it is divided on multiple computers.
 If, for example, the number of nodes is doubled the speed would more than double.
 This would be strange since the processing power does not double.
 
-To compare the efficiency an implementation resolving the edit distance problem has to be made. This will be done according to the schedule mentioned in table \ref{schedule}.
+The easiest way to find out in what range the result will be is to implement and test the algorithm on a GPU-cluster using MPI. This will be done according to the schedule mentioned below.
 
 \section{Related work}
 \subsection{Edit distance problem on GPU}
-As mentioned before the edit distance problem has already been implemented on a single GPU \cite{Heus:GPGPU}.
+As mentioned before the edit distance problem has already been implemented on a single GPU\cite{Heus:GPGPU}.
 This implementation also uses the operations insert, delete, and replace.
 This implementation will be improved if necessary and will probably be the base of the future implementation.
 The result of this project could be compared to this single node implementation to calculate the difference in time required to compute the edit distance of two strings.
 
-\balancecolumns
 \subsection{Benchmark on a GPU-cluster}
-This is an MPI-OpenCL implementation of the LINPACK benchmark which was run on a cluster containing 49 nodes, each node containing two eight-core CPUs and four GPUs \cite{Cluster}.
+This is an MPI-OpenCL implementation of the LINPACK benchmark which was run on a cluster containing 49 nodes, each node containing two eight-core CPUs and four GPUs\cite{Cluster}.
 The implementation achieves 93.69 Tflops, which is 46 percent of the theoretical peak.
 It shows a successful implementation of MPI in combination with OpenCl, which is required in the future implementation of the edit distance algorithm.
 
@@ -316,7 +262,7 @@ The research schedule for this paper is given in Table \ref{schedule}.
 
 \begin{table}
 \centering \caption{Research schedule} \label{schedule}
-\begin{tabular}{|l|l|} \hline
+\begin{tabular}{|r|l|} \hline
 \textbf{Deadline} & \textbf{Task/Deliverable}       \\ \hline
 Oct 12 & Peer reviews                               \\ \hline
 Oct 21 & Final proposal                             \\ \hline
@@ -325,9 +271,8 @@ Nov 2  & Research                                   \\ \hline
 Nov 16 & Dividing the algorithm and implementing    \\ \hline
 Nov 23 & Researching MPI                            \\ \hline
 Nov 30 & Implementing MPI                           \\ \hline
-Dec 7  & Verifying the implementation               \\ \hline
-Dec 14 & Optimizing and debugging                   \\ \hline
-Dec 18 & Getting a test environment                 \\ \hline
+Dec 7  & Optimizing and debugging                   \\ \hline
+Dec 14 & Getting a test environment                 \\ \hline
 Jan 11 & Writing the paper                          \\ \hline
 Jan 18 & Writing a presentation                     \\ \hline
 \end{tabular}
@@ -335,7 +280,7 @@ Jan 18 & Writing a presentation                     \\ \hline
 
 %\balancecolumns
 %\newpage
-%\newpage
+\newpage
 \bibliographystyle{abbrv}
 \bibliography{sigproc}
 
