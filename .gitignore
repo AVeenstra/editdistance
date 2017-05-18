@@ -1,28 +1,43 @@
-# Compiled Object files
-*.slo
+.*
+*.a
+*.app
+*.aux
+*.exe
+*.dll
+*.dylib
+*.gch
+*.glo
+*.idx
+*.la
+*.lai
+*.log
+*.lib
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.dvi
+*.glg
+*.gls
+*.ilg
+*.ind
 *.lo
+*.lof
+*.lot
+*.maf
+*.mod
+*.mtc
+*.mtc1
 *.o
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
 *.out
-*.app
+*.pch
+*.pdf
+*.slo
+*.so
+*.swp
+*.synctex.gz
+

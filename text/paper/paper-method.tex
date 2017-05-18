@@ -1,0 +1,29 @@
+\section{Method}
+The research question is best answered by distributing an verified implementation over a GPU-cluster.
+By answering every subquestion the steps required to answer the main research question should be described.
+
+The first subquestion can be answered by proving mathematically that such a division of the algorithm is possible.
+An implementation could further proof the correct division of the algorithm.
+
+The next subquestion can be answered by searching for examples of such implementations.
+After that the implementation answering the previous subquestion could be expanded using MPI.
+
+The subquestion after that is best answered by describing the steps required to keep the implementation verified during the previous two subquestions.
+After this question has been answered the main question could be considered to be answered, but an GPU-cluster-based implementation is no good if the performance is inferior to an single GPU based implementation.
+Answering the next subquestion could show the performance difference of both implementations.
+
+The last subquestions can be answered by testing.
+One possible way to measure the difference in time required to calculate the edit distance of two large strings, possibly DNA sequences, is to calculate it on every node of the cluster individually and then as a cluster working together.
+The average time every individual node requires can then be compared to the time taken by the cluster.
+This test should be repeated with different sizes of clusters and different types of nodes to obtain reliable and realistic results.
+
+One thing to consider is how to distribute the two strings, especially if they are quite large. A few distribution methods are:
+\begin{enumerate}
+    \item Saving the strings on the nodes before execution.
+    \item Choosing a master node which distributes the string to its slave nodes.
+    \item Hosting the strings on a separate server which does not take part in calculation of the edit distance.
+\end{enumerate}
+Options two and three are the most realistic options, as the distribution of the data would be part of the processing time. Option one on the other hand reduces the bottleneck create by the reading speed of the storage device, which allows comparison of the speed without taking into account the hardware storing the strings.
+
+Option three will probably be used, since a device uploading the strings to a cluster could be a real live situation.
+

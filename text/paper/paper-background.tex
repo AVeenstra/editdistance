@@ -1,0 +1,50 @@
+\section{Background}
+\subsection{OpenCL}
+GPGPU programming is the use of GPUs to handle computation which traditionally is done by CPUs.
+A CPU consists of one or more cores allowing Single Instructions streams and a Single Data stream (SISD).
+A GPU on the other hand has a Single Instruction stream and Multiple Data streams (SIMD).
+The number of cores on a GPU is generally much higher than a CPU has, so a GPU can process more data in parallel using its SIMD architecture.
+
+One programming language allowing the developer to run programs on a GPU is OpenCL.
+OpenCL allows a developer to run a kernel on a GPU or CPU \cite{OpenCL}.
+It is a low level programming language which can run on most GPUs and CPUs and allows general purpose parallel programming across both CPUs and GPUs.
+The traditional CPU-based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3d graphics API such as OpenGL.
+As mentioned before OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs \cite{CUDA}.
+
+In the OpenCL architecture one CPU-based program called the "Host" controls multiple GPUs and CPUs called "Compute Devices".
+Each of those compute devices consist of one or more "Compute Units", which each contain one or more "Processing Elements".
+These processing elements execute the OpenCL kernels provided by the host program.
+After such kernel has finished running the results are returned to the host program.
+The kernel on every processing element is the same, so the only way to change the outcome of the program is to modify the input of the program \cite{OpenCL}.
+
+The memory hierarchy used in OpenCL is not equal to that of the physical memory configuration on GPUs.
+This is to prevent having to take into account every type of architecture, which would be tedious work as the amount of types is quite large.
+Each of the architectural devices discussed above have their own memory, which is inaccessible to components of the same type.
+Every processing element can access its own private memory, the memory of its compute unit, the memory of its compute device.
+The host memory can be accessed, but it is generally slower than the on-board memory \cite{OpenCL}.
+
+The architecture and memory hierarchy already enforce the division of the algorithm if one wants to use every component of a GPU.
+
+\subsection{MPI}
+MPI is a standard specification in communication between computers which enables parallel computing.
+An implementation of this specification is freely available and will be used in this project.
+The implementation allows the transmission of multiple datatypes and messages between nodes.
+It also provides a way to identify all the connected processes and assign an identifier to each process \cite{MPI}.
+These features could help dividing the workload over all nodes.
+
+\subsection{Edit distance}
+The edit distance problem is way of measuring how much two strings differ from each other \cite{Navarro:2001:GTA:375360.375365}.
+The distance is measured by operations like inserting, removing, replacing, and rearranging characters.
+The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
+For this project only inserting, removing, and replacing are considered.
+The operations costs are $C_i$ (insertion), $C_d$ (deletion), and $C_r$ (replacement).
+
+An example input is:
+\begin{align*}
+S_1 &= \text{Saturday}\\
+S_2 &= \text{Sunday}\\
+C_i &= 2\\
+C_d &= 3\\
+C_r &= 4
+\end{align*}
+

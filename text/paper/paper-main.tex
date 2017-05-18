@@ -1,0 +1,113 @@
+\documentclass{sig-alternate-br}
+\usepackage{url}
+\usepackage{verbatim}
+
+\begin{document}
+
+\conferenceinfo{27$^{th}$ Twente Student Conference on IT}{Near future, 2017, Enschede, The Netherlands.}
+%\CopyrightYear{2017} % Allows default copyright year (200X) to be over-ridden - IF NEED BE.
+
+\title{Edit distance on GPU clusters using MPI}
+
+\numberofauthors{1} 
+\author{
+\alignauthor Antoine Veenstra\\
+       \affaddr{University of Twente}\\
+       \affaddr{P.O. Box 217, 7500AE Enschede}\\
+       \affaddr{The Netherlands}\\
+       \email{a.j.veenstra@student.utwente.nl}
+}
+
+\maketitle
+\begin{abstract}
+In this paper, we describe the steps required to distribute a verified implementation of the edit distance problem on a GPU over a GPU-cluster using MPI and OpenCL.
+The new implementation will be verified too and the performance of the cluster will then be compared to that of a single device.
+\end{abstract}
+
+% A category with the (minimum) three required fields (NOT USED in Bachelor Referaat)
+% \category{H.4}{Information Systems Applications}{Miscellaneous}
+%A category including the fourth, optional field follows...
+% \category{D.2.8}{Software Engineering}{Metrics}[complexity
+% measures, performance measures]
+
+\keywords{OpenCL, Edit distance problem, GPU-cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}
+
+%\input{paper-introduction}
+
+\input{paper-questions}
+
+%\input{paper-background}
+
+%\input{paper-method}
+
+\input{paper-q1}
+
+\input{paper-q2}
+
+\input{paper-q3}
+
+\input{paper-q4}
+
+\begin{comment}
+\section{Expected results}
+As only the answer of subquestion 4 will consist of tests only the expected results of these tests will be discussed.
+When comparing different cluster sizes, and lengths of data, the time required to compute the edit distance can be used to define most efficient setup.
+For each cluster size and data length the computation time can be divided in four ranges.
+
+The first range is a negative time difference, which indicates the use of MPI, dividing the algorithm, or the use of a cluster in general is inefficient.
+
+The next range is a difference almost equal to zero, which indicates that dividing the calculation gives too much overhead, denying any reduction of the processing time required.
+
+The third range is a difference up to $n$ times as fast as the single node implementation, where $n$ is the number of nodes in the cluster.
+This would mean that dividing the computation over a cluster is more efficient than calculating it on a single node, but that the overhead caused by the distribution of the algorithm impacts the performance.
+The distribution of algorithms over a GPU-cluster have already shown improved performances, so I suspect to have some setups to be within this range.
+
+The last range is the most improbable. It ranges from $n$ times as fast to beyond, where $n$ is the number of nodes.
+This would mean that the algorithm is more efficient as it is divided on multiple computers.
+If, for example, the number of nodes is doubled the speed would more than double.
+This would be strange since the processing power does not double.
+
+To compare the efficiency an implementation resolving the edit distance problem has to be made. This will be done according to the schedule mentioned in table \ref{schedule}.
+
+\section{Related work}
+\subsection{Edit distance problem on GPU}
+As mentioned before the edit distance problem has already been implemented on a single GPU \cite{Heus:GPGPU}.
+This implementation also uses the operations insert, delete, and replace.
+This implementation will be improved if necessary and will probably be the base of the future implementation.
+The result of this project could be compared to this single node implementation to calculate the difference in time required to compute the edit distance of two strings.
+
+%\balancecolumns
+\subsection{Benchmark on a GPU-cluster}
+This is an MPI-OpenCL implementation of the LINPACK benchmark which was run on a cluster containing 49 nodes, each node containing two eight-core CPUs and four GPUs \cite{Cluster}.
+The implementation achieves 93.69 Tflops, which is 46 percent of the theoretical peak.
+It shows a successful implementation of MPI in combination with OpenCL, which is required in the future implementation of the edit distance algorithm.
+
+\section{Research schedule}
+The research schedule for this paper is given in Table \ref{schedule}.
+
+\begin{table}
+\centering \caption{Research schedule} \label{schedule}
+\begin{tabular}{|l|l|} \hline
+\textbf{Deadline} & \textbf{Task/Deliverable}       \\ \hline
+Oct 12 & Peer reviews                               \\ \hline
+Oct 21 & Final proposal                             \\ \hline
+Oct 26 & (No) Go                                    \\ \hline
+Nov 2  & Research                                   \\ \hline
+Nov 16 & Dividing the algorithm and implementing    \\ \hline
+Nov 23 & Researching MPI                            \\ \hline
+Nov 30 & Implementing MPI                           \\ \hline
+Dec 7  & Verifying the implementation               \\ \hline
+Dec 14 & Optimizing and debugging                   \\ \hline
+Dec 18 & Getting a test environment                 \\ \hline
+Jan 11 & Writing the paper                          \\ \hline
+Jan 18 & Writing a presentation                     \\ \hline
+\end{tabular}
+\end{table}
+\end{comment}
+
+%\balancecolumns
+\bibliographystyle{abbrv}
+\bibliography{sigproc}
+
+
+\end{document}
