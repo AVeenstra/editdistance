@@ -14,11 +14,13 @@ Required packages:
  * opencl-headers
  * fglrx-driver
 
-### Compilation
-`gcc -Wall -o hello hello.c -lOpenCL`
+### Windows
+Required programs:
+ * Visual Studio (tested with 2017)
+ * Driver of your graphics card
 
-### Run
-`./hello`
+### Compilation
+Build with CMake.
 
 ### Issues
 Make sure the executing user has enough pliviliges
