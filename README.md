@@ -17,6 +17,7 @@ Required packages:
 ### Windows
 Required programs:
  * Visual Studio (tested with 2017)
+ * Microsoft MPI v8 [Hosted by Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=54607)
  * Driver of your graphics card
 
 ### Compilation
