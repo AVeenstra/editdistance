@@ -13,6 +13,7 @@ Required packages:
  * amd-clinfo
  * opencl-headers
  * fglrx-driver
+ * mpich repo or [manual](http://www.mpich.org/static/downloads/3.2/mpich-3.2-installguide.pdf) (if manual do not forget the --enable-cxx flag while configuring)
 
 ### Windows
 Required programs:
