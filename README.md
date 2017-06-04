@@ -1,7 +1,8 @@
-# Edit Distance (Levenshtein distance) calculation with a GPU (cluster)
+# Edit Distance (Levenshtein distance) calculation on a GPU cluster, managed by MPI.
 
 ## Installation
-Mpich can be installed from the repositories of the distribution, but if multiple distributions should
+Mpich can be installed from the repositories of the distribution, but if multiple distributions or distribution versions will be used you should install Mpich manually to guarantee the same version is installed on all the nodes.
+Mpich and MSMPI are not compatible and Mpich is not available on Windows, but maybe OpenMPI could work on both.
 The following setups have been tested:
 
 ### Debian (Jessie) with AMD GPUs
@@ -29,7 +30,7 @@ Required packages:
 ### Windows
 Required programs:
  * Visual Studio (tested with 2017)
- * Microsoft MPI v8 [Hosted by Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=54607)
+ * Microsoft MPI (MSMPI) v8 [Hosted by Microsoft](https://www.microsoft.com/en-us/download/details.aspx?id=54607)
  * Driver of your graphics card
 
 ### Compilation
