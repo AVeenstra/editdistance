@@ -6,24 +6,28 @@
 \usepackage[table]{xcolor}
 \usepackage{algpseudocode}
 \usepackage{algorithm}
+\usepackage{svg}
 
-\begin{document}
+\newcommand\todo[1]{\textcolor{red}{#1}}
 
 \conferenceinfo{27$^{th}$ Twente Student Conference on IT}{Near future, 2017, Enschede, The Netherlands.}
-%\CopyrightYear{2017} % Allows default copyright year (200X) to be over-ridden - IF NEED BE.
+\CopyrightYear{2017}
 
 \title{Edit distance on GPU clusters using MPI}
 
 \numberofauthors{1} 
 \author{
-\alignauthor Antoine Veenstra\\
-       \affaddr{University of Twente}\\
-       \affaddr{P.O. Box 217, 7500AE Enschede}\\
-       \affaddr{The Netherlands}\\
-       \email{a.j.veenstra@student.utwente.nl}
+    \alignauthor Antoine Veenstra\\
+    \affaddr{University of Twente}\\
+    \affaddr{P.O. Box 217, 7500AE Enschede}\\
+    \affaddr{The Netherlands}\\
+    \email{a.j.veenstra@student.utwente.nl}
 }
 
+\begin{document}
+{ \hfuzz=12pt
 \maketitle
+}
 \begin{abstract}
 In this paper, we describe the steps required to distribute a verified implementation of the edit distance problem on a GPU over a GPU-cluster using MPI and OpenCL.
 The new implementation will be verified too and the performance of the cluster will then be compared to that of a single device.
@@ -76,7 +80,7 @@ To compare the efficiency an implementation resolving the edit distance problem 
 
 \section{Related work}
 \subsection{Edit distance problem on GPU}
-As mentioned before the edit distance problem has already been implemented on a single GPU \cite{Heus:GPGPU}.
+As mentioned before the edit distance problem has already been implemented on a single GPU \cite{Heus}.
 This implementation also uses the operations insert, delete, and replace.
 This implementation will be improved if necessary and will probably be the base of the future implementation.
 The result of this project could be compared to this single node implementation to calculate the difference in time required to compute the edit distance of two strings.

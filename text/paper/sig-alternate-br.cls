@@ -704,7 +704,7 @@
 % make aubox hsize/number of authors up to 3, less gutter
 % then showbox gutter showbox gutter showbox -- GKMT Aug 99
 \newbox\@acmtitlebox
-\def\@maketitle{\newpage
+\def\@maketitle{\newpage \hfuzz=20pt
  \null
  \setbox\@acmtitlebox\vbox{%
 \baselineskip 20pt
@@ -841,7 +841,7 @@
 \def\ftype@copyrightbox{8}
 \def\@copyrightspace{
 \@float{copyrightbox}[b]
-\begin{center}
+\begin{center} \hfuzz=10pt
 \setlength{\unitlength}{1pc}
 \begin{picture}(20,6) %Space for copyright notice
 \put(0,-0.84){\crnotice{\@toappear}}
