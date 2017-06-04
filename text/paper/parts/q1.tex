@@ -1,0 +1,77 @@
+\section{Dividing the algorithm in multiple processes}
+The algorithm de Heus uses a dynamic programming solution\cite{Heus:GPGPU}.
+In his paper he describes a way to distribute the computation on multiple work-groups of a GPU.
+The dynamic programming algorithm fills a matrix with the following rules\cite{Jordan}:
+
+\begin{equation} \label{eq1}
+\begin{split}
+H_{(-1,j)} & = j \\
+H_{(i,-1)} & = i \\
+H_{(i,j)} & = \min \begin{cases}
+          \operatorname{H}_{(i-1,j)} + 1 \\
+          \operatorname{H}_{(i,j-1)} + 1 \\
+          \operatorname{H}_{(i-1,j-1)} + Score
+\end{cases}
+\end{split}
+\end{equation}
+
+Where $Score$ is zero if the characters of the compared sequences at index $i$ and $j$ are equal; otherwise, the $Score$ is one.
+%Note that if the characters are equal the value of $H_{(i-1,j-1)} + Score$ is always lower than or equal to 
+
+The value of $H_{(i,j)}$ is depends on the cells $H_{(i-1,j)}$, $H_{(i,j-1)}$, and $H_{(i-1,j-1)}$.
+This limits the use of parallelism to speed up the computation, but it leaves an opening none the less.
+There is no dependency between cells $H_{(a,b)}$ if $a + b$ is constant.
+The grey cells in table \ref{diagonal} are such a group of cells which can be calculated in parallel.
+
+{\newcommand\C[0]{\cellcolor{gray}}
+
+\begin{table}
+\centering \caption{Example matrix} \label{diagonal}
+\large
+\begin{tabular}{|c|c||c|c|c|c|c|c|} \hline
+           &            & \textbf{k} & \textbf{i} & \textbf{t} & \textbf{t} & \textbf{e} & \textbf{n} \\ \hline
+           & \textbf{0} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} \\ \hline \hline
+\textbf{s} & \textbf{1} & 1          & 2          & 3          & 4          & \C         &            \\ \hline
+\textbf{i} & \textbf{2} & 2          & 1          & 2          & \C         &            &            \\ \hline
+\textbf{t} & \textbf{3} & 3          & 2          & \C         &            &            &            \\ \hline
+\textbf{t} & \textbf{4} & 4          & \C         &            &            &            &            \\ \hline
+\textbf{i} & \textbf{5} & \C         &            &            &            &            &            \\ \hline
+\textbf{n} & \textbf{6} &            &            &            &            &            &            \\ \hline
+\textbf{g} & \textbf{7} &            &            &            &            &            &            \\ \hline
+\end{tabular}
+\end{table}
+}
+
+With larger sequences the diagonal becomes too large to calculate in one iteration.
+At that point the use of multiple work-groups can be justified.
+These groups will have to share some data between them.
+
+\begin{algorithm}
+\caption{Parallel Levenshtein Algorithm} \label{pseudo}
+\begin{algorithmic}[1]
+\Procedure{Levenshtein}{$col, row, id, n, a, b, d1, d2, out$}\Comment{The Levenshtein distance between sequences $a$ and $b$}
+    \Require $n is even$
+    \Require $out is int[n]$
+    \State $col\gets col + id$
+    \State $row\gets row - id$
+    \For{$row \dots row + n$}
+        %\If{$row \get $}
+        \If{$a[col] \not= b[row]$}
+            \State $cost\gets 1$
+        \Else
+            \State $cost\gets 0$
+        \EndIf
+        
+        
+    \EndFor
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+3 algorithms
+
+*1 fill_row
+
+*2 fill_defaults
+
+*3 main
