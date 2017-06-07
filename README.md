@@ -29,9 +29,11 @@ Required packages:
  * nvidia-opencl-dev
  
 #### Ubuntu (16.04) with AMD GPUs
-PPA with extra packages (probably optional): ''sudo add-apt-repository ppa:oibaf/graphics-drivers''
+PPA with extra packages (probably optional): `sudo add-apt-repository ppa:oibaf/graphics-drivers`
+
 Required packages:
  * ocl-icd-opencl-dev
+ * mesa-opencl-icd-dbg
  
 ### Windows
 Required programs:
