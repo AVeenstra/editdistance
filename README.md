@@ -5,27 +5,35 @@ Mpich can be installed from the repositories of the distribution, but if multipl
 Mpich and MSMPI are not compatible and Mpich is not available on Windows, but maybe OpenMPI could work on both.
 The following setups have been tested:
 
-### Debian (Jessie) with AMD GPUs
+### Linux general
+Required packages:
+ * g++
+ * cmake
+ * opencl-headers
+ * mpi:
+   * mpich repo or [manual](http://www.mpich.org/static/downloads/3.2/mpich-3.2-installguide.pdf) (if manual do not forget the --enable-cxx flag while configuring)
+   * libopenmpi-dev
+
+#### Debian (Jessie) with AMD GPUs
 Required packages:
  * amd-opencl-dev
  * amd-libopencl1-dev
- * gcc
- * g++
- * cmake
  * amd-opencl-icd
  * amd-clinfo
- * opencl-headers
  * fglrx-driver
- * mpich repo or [manual](http://www.mpich.org/static/downloads/3.2/mpich-3.2-installguide.pdf) (if manual do not forget the --enable-cxx flag while configuring)
 
-### Ubuntu (16.04) with Nvidia GPUs
+#### Ubuntu (16.04) with Nvidia GPUs
 Required packages:
  * nvidia-375
  * nvidia-opencl-icd-375
  * nvidia-opencl-dev
- * gcc
- * cmake
- * mpich repo or [manual](http://www.mpich.org/static/downloads/3.2/mpich-3.2-installguide.pdf) (if manual do not forget the --enable-cxx flag while configuring)
+ 
+#### Ubuntu (16.04) with AMD GPUs
+PPA with extra packages (probably optional): `sudo add-apt-repository ppa:oibaf/graphics-drivers`
+
+Required packages:
+ * ocl-icd-opencl-dev
+ * mesa-opencl-icd-dbg
  
 ### Windows
 Required programs:
