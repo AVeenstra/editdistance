@@ -23,7 +23,7 @@ One thing to consider is how to distribute the two strings, especially if they a
     \item Choosing a master node which distributes the string to its slave nodes.
     \item Hosting the strings on a separate server which does not take part in calculation of the edit distance.
 \end{enumerate}
-Options two and three are the most realistic options, as the distribution of the data would be part of the processing time. Option one on the other hand reduces the bottleneck create by the reading speed of the storage device, which allows comparison of the speed without taking into account the hardware storing the strings.
+Options two and three are the most realistic options, as the distribution of the data would be part of the processing time. Option one on the other hand reduces the bottleneck created by the reading speed of the storage device, which allows comparison of the speed without taking into account the hardware storing the strings.
 
 Option three will probably be used, since a device uploading the strings to a cluster could be a real live situation.
 

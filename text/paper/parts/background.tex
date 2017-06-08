@@ -1,4 +1,6 @@
 \section{Background}
+\todo{Correct mistakes}
+
 \subsection{OpenCL}
 GPGPU programming is the use of GPUs to handle computation which traditionally is done by CPUs.
 A CPU consists of one or more cores allowing Single Instructions streams and a Single Data stream (SISD).
@@ -11,8 +13,8 @@ It is a low level programming language which can run on most GPUs and CPUs and a
 The traditional CPU-based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3d graphics API such as OpenGL.
 As mentioned before OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs \cite{CUDA}.
 
-In the OpenCL architecture one CPU-based program called the "Host" controls multiple GPUs and CPUs called "Compute Devices".
-Each of those compute devices consist of one or more "Compute Units", which each contain one or more "Processing Elements".
+In the OpenCL architecture one CPU-based program call\-ed the \textit{Host} controls multiple GPUs and CPUs called \textit{Compute Devices}.
+Each of those compute devices consist of one or more \textit{Compute Units}, which each contain one or more \textit{Processing Elements}.
 These processing elements execute the OpenCL kernels provided by the host program.
 After such kernel has finished running the results are returned to the host program.
 The kernel on every processing element is the same, so the only way to change the outcome of the program is to modify the input of the program \cite{OpenCL}.
@@ -31,6 +33,7 @@ An implementation of this specification is freely available and will be used in 
 The implementation allows the transmission of multiple datatypes and messages between nodes.
 It also provides a way to identify all the connected processes and assign an identifier to each process \cite{MPI}.
 These features could help dividing the workload over all nodes.
+\todo{like forking}
 
 \subsection{Edit distance}
 The edit distance problem is way of measuring how much two strings differ from each other \cite{Navarro:2001:GTA:375360.375365}.
@@ -40,11 +43,18 @@ For this project only inserting, removing, and replacing are considered.
 The operations costs are $C_i$ (insertion), $C_d$ (deletion), and $C_r$ (replacement).
 
 An example input is:
-\begin{align*}
-S_1 &= \text{Saturday}\\
-S_2 &= \text{Sunday}\\
+\begin{equation} \label{ed}
+\begin{split}
+S_1 &= \text{`Saturday'}\\
+S_2 &= \text{`Sunday'}\\
 C_i &= 2\\
 C_d &= 3\\
 C_r &= 4
-\end{align*}
+\end{split}
+\end{equation}
+\todo{improve and state we will be using the Levenshtein distance}
 
+\todo{fix underfull vbox}
+
+\subsection{Specification language}
+\todo{continue}

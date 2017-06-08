@@ -10,7 +10,7 @@
 % April 22nd. 2009 - Inserted various bug-fixes and improvements - Gerry
 %
 % To produce Type 1 fonts in the document plus allow for 'normal LaTeX accenting' in the critical areas;
-% title, author block, section-heads, confname, etc. etc. 
+% title, author block, section-heads, confname, etc. etc.
 % i.e. the whole purpose of this version update is to NOT resort to 'inelegant accent patches'.
 % After much research, three extra .sty packages were added to the the tail (ae, aecompl, aeguill) to solve,
 % in particular, the accenting problem(s). We _could_ ask authors (via instructions/sample file) to 'include' these in
@@ -45,10 +45,6 @@
 \def\fileversion{v2.4}          % for ACM's tracking purposes
 \def\filedate{April 22, 2009}    % Gerry Murray's tracking data
 \def\docdate {Wednesday 22nd. April 2009} % Gerry Murray (with deltas to doc}
-\usepackage{epsfig}
-\usepackage{amssymb}
-\usepackage{amsmath}
-\usepackage{amsfonts}
 % Need this for accents in Arial/Helvetica
 %\usepackage[T1]{fontenc}  % Gerry March 12, 2007 - causes Type 3 problems (body text)
 %\usepackage{textcomp}
@@ -315,7 +311,7 @@
 \newfont{\secfnt}{ptmb8t at 12pt}
 \newfont{\secit}{ptmbi8t at 12pt}    %13 Jan 00 gkmt
 \newfont{\subsecfnt}{ptmri8t at 11pt}
-\newfont{\subsecit}{ptmbi8t at 11pt}  % 
+\newfont{\subsecit}{ptmbi8t at 11pt}  %
 \newfont{\ttlfnt}{phvb8t at 18pt}
 \newfont{\ttlit}{phvbo8t at 18pt}    % GM 2/4/2000
 \newfont{\subttlfnt}{phvr8t at 14pt}
@@ -517,7 +513,7 @@
   \hrule width .5\columnwidth   % (was .4) updated Gerry March 20 2007
   \kern 2.6\p@}                 % The \hrule has default height of .4pt % (was .4) updated Gerry March 20 2007
 % ------
-\long\def\@makefntext#1{\noindent 
+\long\def\@makefntext#1{\noindent
 %\hbox to .5em{\hss$^{\@thefnmark}$}#1}   % original
 \hbox to .5em{\hss\textsuperscript{\@thefnmark}}#1}  % C. Clifton / GM Oct. 2nd. 2002
 % -------
@@ -1219,7 +1215,7 @@
 %\def\citeA{\start@cite10}
 \DeclareRobustCommand\citeA{\start@cite10}      % January 2008
 \def\citeANP{\citeA*}
-%\def\shortcite{\start@cite23}              
+%\def\shortcite{\start@cite23}
 \DeclareRobustCommand\shortcite{\start@cite23}      % January 2008
 \def\shortciteNP{\shortcite*}
 %\def\shortciteA{\start@cite20}
@@ -1307,11 +1303,11 @@
 \newdimen\bibindent
 \setcounter{enumi}{1}
 \bibindent=0em
-\def\thebibliography#1{% 
+\def\thebibliography#1{%
 \ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
      \section[References]{%    <=== OPTIONAL ARGUMENT ADDED HERE
         {References} % was uppercased but this affects pdf bookmarks (SP/GM October 2004)
-          {\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing) 
+          {\vskip -9pt plus 1pt} % GM Nov. 2006 / GM July 2000 (for somewhat tighter spacing)
          \@mkboth{{\refname}}{{\refname}}%
      }%
      \list{[\arabic{enumi}]}{%
@@ -1456,11 +1452,11 @@ requires prior specific permission and/or a fee.}
 % font. Conversely the letter-character font would be correct but, e.g. a 'bar' would appear superimposed on the
 % character instead of, say, an unlaut/diaresis. Sometimes the letter-character would NOT appear at all.
 % Using [T1]{fontenc} outright was not an option as this caused 99% of the authors to 'produce' a Type-3 (bitmapped)
-% PDF file - useless for production. 
+% PDF file - useless for production.
 %
-% For proper (font) accenting we NEED these packages to be part of the .cls file i.e. 'ae', 'aecompl' and 'aeguil' 
+% For proper (font) accenting we NEED these packages to be part of the .cls file i.e. 'ae', 'aecompl' and 'aeguil'
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%% This is file `ae.sty' 
+%% This is file `ae.sty'
 \def\fileversion{1.3}
 \def\filedate{2001/02/12}
 \NeedsTeXFormat{LaTeX2e}
@@ -1481,7 +1477,7 @@ requires prior specific permission and/or a fee.}
     \renewcommand{\ttdefault}{aett}
 \fi
 \endinput
-%% 
+%%
 %% End of file `ae.sty'.
 %
 %
@@ -1490,7 +1486,7 @@ requires prior specific permission and/or a fee.}
 \NeedsTeXFormat{LaTeX2e}
 %\ProvidesPackage{aecompl}[\filedate\space\fileversion\space   % GM
 %T1 Complements for AE fonts (D. Roegel)]                      % GM -- keeping the log file clean(er)
- 
+
 \def\@ae@compl#1{{\fontencoding{T1}\fontfamily{cmr}\selectfont\symbol{#1}}}
 \def\guillemotleft{\@ae@compl{19}}
 \def\guillemotright{\@ae@compl{20}}
@@ -1510,18 +1506,18 @@ requires prior specific permission and/or a fee.}
 \endinput
 %
 %
-%% This is file `aeguill.sty' 
+%% This is file `aeguill.sty'
 % This file gives french guillemets (and not guillemots!)
-% built with the Polish CMR fonts (default), WNCYR fonts, the LASY fonts 
-% or with the EC fonts. 
+% built with the Polish CMR fonts (default), WNCYR fonts, the LASY fonts
+% or with the EC fonts.
 % This is useful in conjunction with the ae package
 % (this package loads the ae package in case it has not been loaded)
 %  and with or without the french(le) package.
 %
 % In order to get the guillemets, it is necessary to either type
 % \guillemotleft and \guillemotright, or to use an 8 bit encoding
-% (such as ISO-Latin1) which selects these two commands, 
-% or, if you use the french package (but not the frenchle package), 
+% (such as ISO-Latin1) which selects these two commands,
+% or, if you use the french package (but not the frenchle package),
 % to type << or >>.
 %
 % By default, you get the Polish CMR guillemets; if this package is loaded
@@ -1535,7 +1531,7 @@ requires prior specific permission and/or a fee.}
 % and these guillemets are very close in shape to the EC guillemets.
 % There are no free Type 1 versions of the EC fonts.
 %
-% Support for Polish CMR guillemets was kindly provided by 
+% Support for Polish CMR guillemets was kindly provided by
 % Rolf Niepraschk <niepraschk@ptb.de> in version 0.99 (2000/05/22).
 % Bernd Raichle provided extensive simplifications to the code
 % for version 1.00.
@@ -1592,12 +1588,12 @@ requires prior specific permission and/or a fee.}
   \def\selectguillfont{\fontencoding{T1}\fontfamily{#1}\selectfont}%
   \def\@oguills{{\selectguillfont\symbol{19}}}%
   \def\@fguills{{\selectguillfont\symbol{20}}}%
-  } 
+  }
 
 \newcommand{\aeguills}{%
   \ae@guills
   % We redefine \guillemotleft and \guillemotright
-  % in order to catch them when they are used 
+  % in order to catch them when they are used
   % with \DeclareInputText (in latin1.def for instance)
   % We use \auxWARNINGi as a safe indicator that french.sty is used.
   \gdef\guillemotleft{\ifx\auxWARNINGi\undefined
