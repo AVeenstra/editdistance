@@ -3,11 +3,109 @@ Now that the algorithm is split in manageable parts in \fref{section}{q1} the ne
 MPI offers various functions to simplify the distribution, but the main focus will be on exchanging the columns as explained in \fref{section}{partitioning}.
 How the tasks will be divided is the first problem that will be tackled.
 
-\subsection{Dividing the parts}
-\todo{continue}
+\subsection{Distributing the parts}
+MPI is comparable to the traditional forking of threads in C and its derivatives.
+Each node runs the same command and has its own unique id.
+The MPI framework enables the communication between those processes with a set of utilities.
+Nodes can send and receive messages, read and write memory on other nodes, read and write files on other nodes, compute simple mathematical operations on variables available on each node, and much more \cite{MPI}.
+The distribution of the workload of the edit distance problem can be done by simply passing a few messages.
+Each node needs to know which part it has to compute and give the following node a column number of where their part starts.
+After a node has finished a part it picks the next part by adding the sum of the widths of the nodes to the current column number.
+\fref{Section}{algorithms} explains what the width of a node is.
+The sum of those widths can easily be computed by using a cluster wide mathematical operation command available in MPI.
 
-\subsection{File sharing}
-\todo{continue}
+The height of the blocks can me negotiated between the nodes.
+The lowest width of the nodes is communicated to all nodes and they multiply that by a constant.
+This constant should not be too small as the overhead of starting a run would impact the overall performance, but it should not be too big either since not enough blocks will be available for parallel computation.
 
-\subsection{Sending blocks}
-\todo{continue}
+After the computation is complete the node which has processed the last block should return the result.
+MPI shows the output of all the nodes, so there is no need to forward any results to a specific node.
+
+\begin{algorithm}
+\caption{MPI controll} \label{MPIalg}
+\begin{algorithmic}[1]
+\Procedure{main}{$id$, $column$, $s_a\_length$, $s_b\_length$, $width$, $cluster\_total\_width$, $blocks\_num$, $max\_height$}
+    \If{$id \neq 0$}
+        \State{\Call{queue.put}{\textproc{mpi\_receive\_column}()}}
+    \EndIf
+    \Statex
+    \While{$column < s_a\_length$}
+        \State{$s_a \gets$ \Call{read\_part}{$column, width$}}
+        \State{\Call{cl\_write\_mem}{$s_a$}}
+        \For{$block$ is $0 \dots blocks\_num$}
+            \If{$0 \neq column$}
+                \State{\textbf{if} \Call{is\_last\_part\_local}{\relax} \Or}\Indent \Indent
+                        \State{\textbf{not} \Call{is\_last\_row}{\relax} \textbf{then}}\EndIndent
+                    \State{\Call{queue.put}{\textproc{receive\_column}()}}\EndIndent
+                \State{\textbf{end if}}
+            \ElsIf{$blocks\_num - block = 1$}
+                \State{\Call{queue.put}{\textproc{receive\_column}()}}
+            \EndIf
+            \Statex
+            \If{$0 \neq column$}
+                 \State{$column \gets $\Call{queue.pop}{$id$}}
+            \Else
+                 \State{$column \gets $\Call{empty\_column}{\relax}}
+            \EndIf
+            \Statex
+            \State{$height \gets $\textproc{min}(} \Indent
+                \State{$max\_height,$}
+                \State{$s_b\_length - block * max\_height$} \EndIndent
+            \State{)}
+            \Statex
+            \State{$column \gets $\textproc{execute\_kernel}(} \Indent
+                \State{$max\_height, height, width, s_a,$}
+                \State{$block, column, $\textproc{queue.peek}()} \EndIndent
+            \State{)}
+            \Statex
+            \If{\textbf{not} \Call{is\_last\_part\_global}{\relax}}
+                \State{\Call{mpi\_send\_column}{$column$}}
+            \ElsIf{$blocks\_num - block = 1$}
+                \State{$result \gets height - 1 $}
+                \State{\Call{print}{"Result: " + $column[result]$}}
+            \EndIf
+        \EndFor
+        \State{$column \gets column + cluster\_total\_width$}
+    \EndWhile
+\EndProcedure
+\begin{comment}
+\Statex
+\Function{execute\_kernel}{$max\_height$, $height$, $width$, $s_a$, $block$, $column$, $column\_next$}
+    \If{$block \neq 0$}
+        \State{$diagonal\_size \gets s_a.length * 2 - 1$}
+        \State{\Call{cl\_copy\_memory}{from=$max\_height$, to=$0$, size=$diagonal\_size$}}
+        \Statex
+        \State{\Call{cl\_write\_memory}{to=$diagonal\_size$, from=$column[s_a.length - 2:]$}}
+        \State{$column\_size \gets max\_height - s_a.length + 2$}
+        \State{\Call{cl\_write\_memory}{to=$diagonal\_size + column\_size$, from=$column\_next$}}
+    \Else
+        \State{\Call{cl\_write\_memory}{to=$s_a.length + 1$, $column$}}
+        \State{\Call{cl\_write\_memory}{to=$s_a.length + 1 + max\_height$, $column\_next$}}
+    \EndIf
+    \State{\vdots}
+    \State{\textbf{return} \Call{cl\_read\_memory}{1, $max\_height$}}
+\EndFunction
+\end{comment}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{The MPI algorithm}
+\fref{Algorithm}{MPIalg} shows how each node works together.
+The initialisation and finalisation phases have been left out, since they are not important to the algorithm.
+Arguments of the procedure are queried in the initialisation phase.
+
+The $id$ is the unique identifier of the process.
+The $column$ contains the column index where the node has to start. During the while loop on lines 5 to 38 this variable will contain the column index of the part being processed.
+Variables $s_a\_length$ and $s_b\_length$ contain the lengths of sequences a and b.
+The $width$ is the width as explained in \fref{section}{algorithms}.
+Variable $cluster\_total\_width$ contains the sum of the width variables of all the nodes in the cluster.
+It is the maximum number of columns the GPUs in the cluster can handle at any given time.
+The $blocks\_num$ is the number of blocks in a part minus the starting block, so the $blocks\_num$ in \fref{table}{division} equals $2$.
+The variable $max\_height$ is equal to the maximum number of iterations a block will have.
+
+\todo{explain algorithm}
+
+\todo{Deadlock}
+
+%\subsection{File sharing}
+%While MPI supports the sharing of files between nodes it lies out of the scope of the research questions to find an efficient

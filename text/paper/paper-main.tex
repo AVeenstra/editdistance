@@ -1,5 +1,6 @@
 \documentclass{sig-alternate-br}
 \setlength{\paperheight}{297mm}
+\usepackage{comment} % for comment blocks
 \usepackage{mathtools} % for equation
 \usepackage[table]{xcolor} % for grey cells in tables
 \usepackage{algpseudocode} % for pseudocode
@@ -8,10 +9,16 @@
 \usepackage{svg} % for svg images
 \usepackage[pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
 \pdfsuppresswarningpagegroup=1
-\flushbottom
+
 \newcommand\todo[1]{\textcolor{red}{Todo: #1}}
 
 \newcommand\fref[2]{\hyperref[#2]{#1 \ref*{#2}}}
+
+\renewcommand\And{\textbf{and}}
+\algnewcommand\Or{\textbf{or}}
+\algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
+\algtext*{Indent}
+\algtext*{EndIndent}
 
 \conferenceinfo{27$^{th}$ Twente Student Conference on IT}{Near future, 2017, Enschede, The Netherlands.}
 \CopyrightYear{2017}

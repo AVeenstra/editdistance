@@ -170,7 +170,7 @@ Both share the same property of having three consecutive cells defining the midd
 The obvious difference being the amount of cell being processed each iteration.
 In the following section you will find the algorithm to compute this block.
 
-\subsection{The algorithms}
+\subsection{The OpenCL algorithms} \label{algorithms}
 \fref{Figure}{division} shows three kinds of blocks.
 How blocks like $A$ and $D$ are computed is explained in \fref{section}{section:initial} and can be seen in \fref{figure}{start}.
 How blocks like $B$ and $E$ are computed is explained in \fref{section}{section:diagonal} and can be seen in figures \ref{division} and \ref{twovars}.
@@ -240,7 +240,7 @@ This means that no thread can be in the reading part while another is writing to
     \EndIf
     \Statex
     \State{$a \gets s_a[id]$}
-    \For{$i$ is $0$ to $width - 1$}
+    \For{$i$ is $0$ \dots $width - 1$}
         \State{\Call{barrier}{\relax}}
         \If{$id \leq i$}
             \Statex
