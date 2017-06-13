@@ -1,2 +1,53 @@
-\section{Testing the performance}
-\todo{continue}
+\section{Testing the performance} \label{testing}
+
+\begin{figure*}[htb]
+    \centering
+    \subfloat[][Overview]{\label{result_graph}\input{parts/result_graph}}%
+    \subfloat[][Zoomed in]{\label{result_graph_zoom}\input{parts/result_graph_zoom}}
+    \caption{Average time to compute edit distance} \label{result_graph_total}
+\end{figure*}
+
+\begin{figure*}[htb]
+    \centering
+    \subfloat[][Overview]{\label{result_graph_cell}\input{parts/result_graph_cell}}%
+    \subfloat[][Zoomed in]{\label{result_graph_cell_zoom}\input{parts/result_graph_cell_zoom}}
+    \caption{Average time per cell} \label{result_graph_cell_total}
+\end{figure*}
+
+The implementation has been tested on a cluster of two nodes.
+Node 1 has an Nvidia GPU with a maximum work-group size of 1024 and node 2 has an AMD GPU with a maximum work-group size of 256.
+That means that the $width$, as discussed in \fref{section}{algorithms}, are 1024 and 256 on nodes 1 and 2 respectively.
+The implementation has been run on the nodes separately and on the nodes as a cluster.
+This allows us to compare the time the program needs to return the result.
+The values used in figures \ref{result_graph_total} and \ref{result_graph_cell_total} are averages of ten separate runs.
+The x-axes represents product of the lengths of the sequences compared, which is equal to the number of cells in the solution matrix as mentioned in \fref{section}{originalalg}.
+The y-axes represents the average time it takes to solve the problem in \fref{figure}{result_graph_total} and the average time it takes for one cell to be computed in \fref{figure}{result_graph_cell_total}.
+
+\fref{figure}{result_graph_total} shows that the implementation works faster on a cluster and only individual nodes if the number of cells becomes larger than approximately $0.4 \cdot 10^{10}$ cells.
+It also shows that node 2 takes longer than node one to solve the problem.
+This is due to the fact that the width of node 2 is smaller than the width of node 1.
+If the number of cells is equal to $1.0 \cdot 10^{10}$ node 1 takes 10.5 seconds to complete, node 2 takes 47.2 seconds to complete and the cluster takes 9.8 seconds to complete.
+The width used in node 1 is four times as big as the width in node 2, but the time required to solve the problem is 4.50 times as long.
+Therefore we can conclude that node 2 will be the bottleneck in the cluster.
+
+The total width of the cluster is equal to $1024 + 256 = 1280$, and the width of node 2 is 256.
+Since $256 / 1280 = \fact{1}{5}$ we know that node 2 is going to handle one fifth of the pillars.
+So node 2 is the bottleneck and it is going to compute one fifth of the problem.
+That means that the time the cluster should take is one fifth of the time it takes node 2 to solve the problem.
+There is however a small difference between $47.2 / 5.0 = 9.44$ and $9.8$.
+This is probably due to the fact that the use of a cluster takes more time to setup and the communication provides some overhead.
+
+The setup taking more time can be seen in \fref{figure}{result_graph_cell_total}.
+These graphs show the time taken per cell, so extra time taken independent of the number of cells will be visible in these graphs.
+The steep decline in time per cell at the left side of the graph is a clear indication that the time to setup is indeed significant.
+In these graphs it is also visible that the cluster becomes faster than node 1 at approximately $0.4 \cdot 10^{10}$ cells, as the amount of time per cell in the cluster drops below the time per cell in node 1.
+
+\subsection{Comparison of algorithms}
+Comparison with the algorithm of De Heus is not useful, since it can not solve the edit distance of sequences longer than the $width$ of a node \cite{Heus}.
+The implementation of this paper is not focused on such small sequences, as extra complexity and features results in a significant overhead while computing them.
+It is save to say that for comparing small sequences the algorithm of De Heus is more suitable.
+
+Comparing the implementation with CPU based algorithms is also not useful, as there is no reliable method to compare the performance of CPUs with GPUs.
+Even the cost of the devices is not a reliable benchmark as manufacturers do not publish the production cost of a device and use different profit margins.
+That is why no such comparison is included.
+
