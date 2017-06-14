@@ -31,7 +31,7 @@ The width used in node 1 is four times as big as the width in node 2, but the ti
 Therefore we can conclude that node 2 will be the bottleneck in the cluster.
 
 The total width of the cluster is equal to $1024 + 256 = 1280$, and the width of node 2 is 256.
-Since $256 / 1280 = \fact{1}{5}$ we know that node 2 is going to handle one fifth of the pillars.
+Since $256 / 1280 = \frac{1}{5}$ we know that node 2 is going to handle one fifth of the pillars.
 So node 2 is the bottleneck and it is going to compute one fifth of the problem.
 That means that the time the cluster should take is one fifth of the time it takes node 2 to solve the problem.
 There is however a small difference between $47.2 / 5.0 = 9.44$ and $9.8$.
