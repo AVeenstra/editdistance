@@ -7,7 +7,7 @@
 \usepackage{algorithm} % for pseudocode
 \usepackage[caption=false]{subfig} % for multiple figures in q1
 \usepackage{svg} % for svg images
-\usepackage[hidelinks,pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
+\usepackage[pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.13}
 \pdfsuppresswarningpagegroup=1
@@ -18,7 +18,18 @@
 
 \def\NoNumber#1{{\def\alglinenumber##1{}\State #1}\addtocounter{ALG@line}{-1}}
 
-\renewcommand\And{\textbf{and}}
+\definecolor{jml}{rgb}{0.1,0.3,0.1}
+\renewcommand\And{\textbf{ and }}
+\newcommand\Old[1]{\textproc{\textbackslash{}old}(#1)}
+\newcommand\Perm[2]{\textproc{Perm}(#1, #2)}
+\algnewcommand\invariant[1]{{\color{jml}\Statex{\textbf{invariant} #1}}}
+\algnewcommand\requires[1]{{\color{jml}\Statex{\textbf{requires} #1}}}
+\algnewcommand\globalrequires[1]{{\color{jml}\Statex{\textbf{global requires} #1}}}
+\algnewcommand\ensures[1]{{\color{jml}\Statex{\textbf{ensures} #1}}}
+\algnewcommand\globalensures[1]{{\color{jml}\Statex{\textbf{global ensures} #1}}}
+\algnewcommand\loopinv[1]{{\color{jml}\Statex{\textbf{loop\_invariant} #1}}}
+\algnewcommand\context[1]{{\color{jml}\Statex{\textbf{context} #1}}}
+\algnewcommand\Forall[3]{\textbf{(\textbackslash{}forall} #1; #2; #3)}
 \algnewcommand\Or{\textbf{or}}
 \algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
 \algtext*{Indent}
