@@ -4,9 +4,9 @@ The limitations will then be discussed and solved if possible in the following s
 In the final subsection the algorithms used will described.
 
 \subsection{Original algorithm} \label{originalalg}
-The algorithm of De Heus uses a dynamic programming solution\cite{Heus}.
+The algorithm of De Heus uses a dynamic programming solution \cite{Heus}.
 In his paper he describes a way to distribute the computation on multiple work-groups of a GPU.
-The dynamic programming algorithm fills a matrix with the following rules\cite{Jordan}:
+The dynamic programming algorithm fills a matrix with the following rules \cite{Jordan}:
 
 \begin{equation} \label{eq1}
 \begin{split}
@@ -20,17 +20,17 @@ H_{(i,j)} & = \min \begin{cases}
 \end{split}
 \end{equation}
 
-Where $Score$ is zero if the characters of the compared sequences at index $i$ and $j$ are equal; otherwise, the $Score$ is one.
+where $Score$ is zero if the characters of the compared sequences at index $i$ and $j$ are equal; otherwise, $Score$ is one.
 
 The value of $H_{(i,j)}$ depends on the cells $H_{(i-1,j)}$, $H_{(i,j-1)}$, and $H_{(i-1,j-1)}$.
 This limits the use of parallelism to speed up the computation, but it leaves an opening none the less.
 There is no dependency between cells $H_{(a,b)}$ if $a + b$ is constant.
-The grey cells in \fref{figure}{diagonal} are such a group of cells which can be calculated in parallel.
+The grey cells in \cref{diagonal} are such a group of cells which can be calculated in parallel.
 Each diagonal is based on the previous two diagonals, because of the dependencies previously mentioned \cite{Meyers}.
 There is no need to save diagonals prior to those two diagonals, so the implementation can discard the previous diagonals to save memory.
 
 {\newcommand\C[0]{\cellcolor{gray}}
-\begin{figure}
+\begin{figure}[p]
 \centering \large
 \begin{tabular}{|c|c||c|c|c|c|c|c|} \hline
            &            & \textbf{k} & \textbf{i} & \textbf{t} & \textbf{t} & \textbf{e} & \textbf{n} \\ \hline
@@ -54,78 +54,79 @@ These parts will be called pillars.
 Each pillar requires the right most column of the previous pillar due to the dependencies of each cell.
 This means the other columns can be discarded to save memory.
 
-\begin{figure}
+\begin{figure}[p]
     \centering
-    \includesvg[width=0.95\linewidth]{cols}
-    \caption{Division of the matrix} \label{division}
+    \includesvg[width=0.99\linewidth]{cols2}
+    \caption{Partitioning of the matrix} \label{division}
 \end{figure}
 
 Each of the pillars mentioned above can be split in blocks.
-Blocks $A$ to $C$ and $D$ to $F$ in \fref{figure}{division} are such a partitioning.
+Blocks $A$ to $D$, $E$ to $H$, and $I$ to $L$ in \cref{division} are such a partitioning.
 The dependencies of the individual cells are inherited by the individual blocks.
 Just like the cells the blocks can also be calculated in parallel if they are not dependent of one another.
-Block $D$ and $c$ are such blocks as they only require block $B$.
+Block $D$ and $F$ are such blocks as they only require block $B$ and $C$.
 With larger sequences the number of independent blocks becomes more significant.
 As a result the calculation of multiple blocks in parallel becomes more attractive.
 
-Blocks $B$ and $E$ are constructed diagonally to optimise the amount of threads at work at any given time.
-If the blocks where squares, as de Heus suggested \cite{Heus}, the average amount of threads at work would be the average of $1...width...1$ which is approximately $width/2$.
-Blocks $B$ and $E$ on the other hand have an average amount of threads at work of exactly $width$.
-The only disadvantage of this approach is that the top and bottom of each pillar blocks like $A$ and $C$ exist.
-In those blocks the average amount of threads at work is slightly worse than that of a square, but the average of the entire pillar is still superior.
+If the blocks where squares, as De Heus suggested \cite{Heus}, the amount of cells processed in parallel would start at $1$, continue to $width$, and go back to $1$.
+Therefor the average is approximately $width/2$ cells processed in parallel.
+Blocks like $B$ and $K$ on the other hand have an average amount of cells processed in parallel of exactly $width$.
+The only disadvantage of this approach is that the top and bottom of each pillar blocks like $A$ and $D$ exist, but the overall performance is still better.
+Therefor the pillars will be constructed diagonally to optimise the amount of cells processed in parallel at any given time.
 
 \subsection{Storing the diagonals} \label{section:diagonal}
 As mentioned before two diagonals are required to calculate the following diagonal.
-Unfortunately OpenCL offers no support for a arrays of arrays, so either the two diagonals must be saved in separate variables or they must be combined in one larger array.
+Unfortunately OpenCL offers no support for an array of arrays, so either the two diagonals must be saved in separate variables or they must be combined in one larger array.
 Using two variables limits the freedom while implementing the algorithm as the rows must be swapped after each iteration.
 Using a single combined array requires the calculation of indices each time the algorithm accesses the array.
 The two solutions are not significantly different, so another factor should be considered before opting for one of the two solutions.
 
-\begin{figure}%
+\begin{figure}[p]
     \centering
-    \subfloat[][Input]{\label{twovarsinput}\includesvg[width=0.45\linewidth]{twovarsinput}}%
+    \subfloat[][Input]{\label{twovarsinput}\includesvg[width=0.45\linewidth]{twovarsinput}}
     \subfloat[][Output]{\label{twovarsoutput}\includesvg[width=0.45\linewidth]{twovarsoutput}}
     \caption{The two variable implementation} \label{twovars}
 \end{figure}
 
 An input the algorithm should digest is the left column and it should output the right most column of the block.
 In the two variables solution the column values could be divided between and appended to the two diagonals.
-This requires some prepossessing as the even indices of the column should be appended to one diagonal and the odd indices to the other as shown in \fref{figure}{twovarsinput}.
-Some post-processing is also required to retrieve the column after processing as shown in \fref{figure}{twovarsoutput}.
+This requires some prepossessing as the even indices of the column should be appended to one diagonal and the odd indices to the other as shown in \cref{twovarsinput}.
+Some post-processing is also required to retrieve the column after processing as shown in \cref{twovarsoutput}.
 A solution to this problem is to transfer the parts of diagonals a and b as is.
 The pre- and post-processing steps cancel each other out, so there is no need to do so.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \includesvg{singlevar}
+    \includesvg[width=0.65\linewidth]{singlevar}
     \caption{Computation with a single array} \label{singlevar}
 \end{figure}
 
 The digestion of the input and the supplying of output is comparable in the single array solution.
-\fref{Figure}{singlevar} shows the evolution of the single array throughout the computation of a block.
-The block used in this figure is four columns wide and consists of six iterations.
+\Cref{singlevar} shows the evolution of the single array throughout the computation of a block.
+The block used in this figure is block $B$ from \cref{division}, which is four columns wide and consists of seven iterations.
 There is no advantage or disadvantage on which end the input and output are stored.
-The blocks of memory can be transferred to another process as is, just like in the two variable solution.
+The blocks of memory can be transferred to another process as is, just as in the two variable solution.
 
 We can conclude that there are no significant advantages or disadvantages to either solution.
 The single variable solution is only slightly more attractive since there is one less variable to worry about.
 Therefore the single variable solution will be chosen in the algorithms hereafter mentioned.
 
-The calculation of indices is dependent on the iteration count of the algorithm.
+The calculation of indices depends on the iteration count of the algorithm.
 The formula used to get the index of the diagonal to change is $i + n \cdot 2 + 1$ where $i$ is the number of iterations completed and $n$ is the index of the cell in the diagonal.
 The index of the cell above the targeted cell is determined by subtracting $1$ from the index of the targeted cell and the index of the cell to the left of the targeted cell is determined by adding $1$ to the index of the targeted cell.
 This means that the cells used by a thread are three consecutive cells of which the middle one will be replaced with the calculated value.
-This can be seen in \fref{figure}{singlevar}, where three consecutive cells calculate the result of the middle cell.
+This can be seen in \cref{singlevar}, where three consecutive cells calculate the result of the middle cell.
 This figure also shows how the dependency on the iteration count influences the indices of the targeted cells.
 
-A visual representation of which cells are stored in the array can be found twice in \fref{figure}{division}.
-The dashed lines cross all the cells stored in the diagonal at one point in the algorithm.
+A visual representation of which cells are stored in the array can be found twice in \cref{division} as $D1$ and $D2$.
+Lines $D1$ and $D2$ cross all the cells stored in the array at one point in the algorithm.
 The arrows go from the targeted cells to the cell for which the values are calculated during the next iteration.
-The arrows in block $B$ are of the third iteration and the arrows of block $E$ are of the last iteration.
+The arrows next to $D1$ represent the third iteration and the arrows next to $D2$ represent the last iteration.
 The top cell of the lines are stored on index zero and the bottom cell is stored in the last cell of the array.
 This direction has been chosen to make debugging easier as the resulting column will be in the first cells of the diagonal after the run, making them easier to find and compare to known results.
 There is no other advantage or disadvantage if the result is stored the other way around.
-\fref{Figure}{singlevar} also shows this same orientation, where the input is equivalent to the left most column as seen in the diagonal of block $B$ and the output equivalent to the right most column in the diagonal of block $E$.
+\Cref{singlevar} also shows this same orientation.
+The where the input is equivalent to the left most column as seen in $D1$ and the output equivalent to the right most column in $D2$.
 
 %As can be seen in the figure the total size of the diagonal is $total_block_height + width + 1$.
 %In this case the $total_block_height$ is $19$ the $width$ is $10$, so the size of the diagonal is $30$.
@@ -133,67 +134,71 @@ There is no other advantage or disadvantage if the result is stored the other wa
 %Note that those diagonals can not be in the same state at the same time as the diagonal of block $E$ depends on block $B$.
 
 
-\subsection{Constructing the initial diagonal} \label{section:initial}
+\subsection{Constructing the initial diagonals} \label{section:initial}
 Now that the storage of the diagonals has been set the array has to be initiated at the beginning of the pillar.
-In \fref{figure}{tstart} an example of a starting block is shown which is equivalent to block $A$ in \fref{figure}{division}.
+In \cref{tstart} an example of a starting block is shown which is a zoomed in version of block $A$ in \cref{division}, but also applies to block $E$.
 The width of the pillars is $4$, so the block is a triangle of $3$ by $3$ cells.
-The column \textbf{A} and row \textbf{0} are already filled in as they are defined in \fref{equation}{eq1}.
-If the starting block is further down the matrix column \textbf{A} can be copied from the previous pillar and row \textbf{0} can be calculated by adding the offset of the pillar to the cell.
-In \fref{figure}{start} the diagonal and its transformation is shown.
-The coordinates in the figure correspond to the coordinates in \fref{figure}{tstart}.
+
+In \cref{tstart} column \textbf{A} can be copied from the previous pillar and row \textbf{0} can be calculated by adding the offset of the pillar to the cell.
+In \cref{start} the array containing the diagonals and its transformation is shown.
+The coordinates in the \cref{start} correspond to the coordinates in \cref{tstart}.
 Each iteration is numbered and the first iteration of the following block is shown at the bottom.
 
-{\newcommand\C[0]{\cellcolor{gray}}
-\begin{figure}
-\centering \large
-\begin{tabular}{|c|c||c|c|c|c||c} \hline
-           & \textbf{A} & \textbf{B} & \textbf{C} & \textbf{D} & \textbf{E} & $\dotsc$ \\ \hline
-\textbf{0} & \textit{0} & \textit{1} & \textit{2} & \textit{3} & \textit{4} & $\dotsc$ \\ \hline \hline
-\textbf{1} & \textit{1} & B1         & C1         & D1         & \C         &          \\ \hline
-\textbf{2} & \textit{2} & B2         & C2         & \C         & \C         &          \\ \hline
-\textbf{3} & \textit{3} & B3         & \C         & \C         & \C         &          \\ \hline
-\textbf{4} & \textit{4} & \C         & \C         & \C         & \C         &          \\ \hline
-$\vdots$   & $\vdots$   & \C         & \C         & \C         & \C         & $\ddots$ \\
-\end{tabular}
-\caption{Start example} \label{tstart}
+{
+\begin{figure}[t]
+\newcommand\C[0]{\cellcolor{gray}}
+\newcommand{\mc}[3]{\multicolumn{#1}{#2}{#3}}
+\begin{center} \large
+\begin{tabu}{|c||c|[1.5pt]cccc|[1.5pt]c}\cline{2-7} \hline
+           & \mc{1}{c|}{\textbf{A}}  & \mc{1}{c|}{\textbf{B}} & \mc{1}{c|}{\textbf{C}} & \mc{1}{c|}{\textbf{D}} & \mc{1}{c|}{\textbf{E}}& $\cdots$ \\\hline \hline
+\textbf{0} & A0          & \mc{1}{l|}{B0}         & \mc{1}{l|}{C0}         & \mc{1}{l|}{D0}         & E0        & $\cdots$ \\\tabucline[1.5pt]{-}
+\textbf{1} & A1          & \mc{1}{l|}{B1}         & \mc{1}{l|}{C1}         & \mc{1}{l|}{D1}         & \C        & \\\cline{1-5}\cline{7-7}
+\textbf{2} & A2          & \mc{1}{l|}{B2}         & \mc{1}{l|}{C2}         & \C                     & \C        & \\\cline{1-4}\cline{7-7}
+\textbf{3} & A3          & \mc{1}{l|}{B3}         & \C                     & \C                     & \C        & \\\cline{1-3}\cline{7-7}
+\textbf{4} & A4          & \C                     & \C                     & \C                     & \C        & \\\cline{1-2}\cline{7-7}
+$\vdots$   & $\vdots$    & \mc{4}{c|[1.5pt]}{\C Block B}                                                              & $\ddots$ \\\cline{1-2}
+\end{tabu}
+\end{center}
+\caption{Block $A$ zoomed in} \label{tstart}
 \end{figure}
 }
 
-\begin{figure}
+\begin{figure}[t]
     \centering
     \includesvg[width=0.8\linewidth]{start}
     \caption{Computation of the starting block} \label{start}
 \end{figure}
 
-\fref{Figure}{start} resembles to \fref{figure}{singlevar}.
+\cref{start} resembles to \cref{singlevar}.
 Both share the same property of having three consecutive cells defining the middle cell.
 The obvious difference being the amount of cell being processed each iteration.
 In the following section you will find the algorithm to compute this block.
 
-\subsection{The OpenCL algorithms} \label{algorithms}
-\fref{Figure}{division} shows three kinds of blocks.
-How blocks like $A$ and $D$ are computed is explained in \fref{section}{section:initial} and can be seen in \fref{figure}{start}.
-How blocks like $B$ and $E$ are computed is explained in \fref{section}{section:diagonal} and can be seen in figures \ref{division} and \ref{twovars}.
-Only how blocks like $C$ and $F$ can be computed has not been discussed.
-If the same algorithm is used as used on blocks $B$ and $E$ some threads will go out of bounds.
-This poses no problem as both the result and the output column are independent of cells below it.
-Thus the algorithm used on blocks like $B$ and $E$ will be used on blocks like $C$ and $F$.
+\subsection{Computation of the last block} \label{section:lastblock}
+At the bottom of every pillar there is a block with a flat base.
+In \cref{division} $D$, $H$, and $L$ are such blocks.
+If the same method as in \cref{singlevar} is used the array of diagonals will go out of bounds.
+However, this poses no problem as both the result and the output column are independent of the cells below it.
+Thus blocks $D$, $H$, and $L$ will be treated the same way as blocks like $B$.
+The only difference is the number of iterations required to get the right most column of the block.
 
-\begin{algorithm}[htb]
+\begin{algorithm*}[!ht]
 \caption{Parallel algorithm to process blocks} \label{block}
+\begin{multicols}{2}
 \begin{algorithmic}[1]
 \Procedure{Block\_calc}{$id, width, s_a, s_b, height, d$}
     \requires{$s_a \neq$ NULL}
     \requires{$s_b \neq$ NULL}
     \requires{$d \neq$ NULL}
+    \requires{$0 \leq id \And id < width$}
     \requires{$s_a.length \ge width$}
     \requires{$s_b.length \ge width + height$}
     \requires{$d.length \ge width \cdot 2 + height$}
-    \requires{\Perm{$s_a[width - 1 - id]$}{$p$}}
-    \requires{\Forall{$i$}{$id \le i \And i < id + height$}{\Perm{$s_b[i]$}{$p$}}}
+    \requires{\Perm{$s_a[width - 1 - id]$}{$read$}}
+    \requires{\Forall{$i$}{$id \le i \And i < id + height$}{\Perm{$s_b[i]$}{$read$}}}
     \requires{\Forall{$i$}{$id \cdot 2 + 1 \le i \And i < id \cdot 2 + 1 + height$}{$\Perm{d[i]}{write}}$}
-    \requires{\Perm{$id \cdot 2$}{$p$}}
-    \requires{\Perm{$id \cdot 2 + 1 + height$}{$p$}}
+    \requires{\Perm{$d[id \cdot 2]$}{$read$}}
+    \requires{\Perm{$d[id \cdot 2 + 1 + height]$}{$read$}}
     \ensures{$d[0] = \Old{d[0]}$}
     \ensures{$d[height + width \cdot 2 - 1] = \Old{d[height + width \cdot 2 - 1]}$}
     \Statex
@@ -201,69 +206,85 @@ Thus the algorithm used on blocks like $B$ and $E$ will be used on blocks like $
     \Statex
     \loopinv{$x = i + id \cdot 2 + 1$}
     \For{$i$ is $0 \dots height$}
-        \requires{$\Perm{d[x-1]}{p} \And \Perm{d[x+1]}{p}$}
+        \requires{$\Perm{d[x-1]}{read}$}
+        \requires{$\Perm{d[x+1]}{read}$}
         \requires{$\Perm{d[x]}{write}$}
+        \Statex
+        \ensures{$\Perm{d[x+1]}{read} * \Perm{d[i+(id+1)\cdot2+1]}{write}$}
+        \ensures{$\Perm{d[x-1]}{read} * \Perm{d[i+(id-1)\cdot2+1]}{write}$}
         \State{\Call{barrier}{\relax}}
         \Statex
-        \If{$a$ is $s_b[id + i]$}
+        \If{$a = s_b[id + i]$}
             \State $Score \gets 0$
         \Else
             \State $Score \gets 1$
         \EndIf
-        \ensures{$a = s_b[id + i] <==> Score = 0$}
-        \ensures{$a \neq s_b[id + i] <==> Score = 1$}
+        \ensures{$a = s_b[id + i] \Leftrightarrow Score = 0$}
+        \ensures{$a \neq s_b[id + i] \Leftrightarrow Score = 1$}
         \Statex
         \State{$x \gets i + id \cdot 2 + 1$}
         \State{$cell\_d \gets d[x] + Score$}
         \State{$cell\_up \gets d[x - 1] + 1$}
-        \State{$cell\_left \gets d[x + 1] + 1$}
+        \State{$\mathit{cell\_left} \gets d[x + 1] + 1$}
         \Statex
-        \State{$d[x] \gets $\Call{minimum}{$cell\_up, cell\_left, cell\_d$}}
+        \State{$d[x] \gets $\Call{minimum}{$cell\_up, \mathit{cell\_left}, cell\_d$}}
         \ensures{$d[x] = \textproc{minimum}(\Call{minimum}{d[x - 1], d[x + 1]} + 1, d[x] + Score)$}
     \EndFor
 \EndProcedure
 \end{algorithmic}
-\end{algorithm}
+\end{multicols}
+\end{algorithm*}
 
-\todo{Barrier removal}
+\subsection{The OpenCL algorithms} \label{algorithms}
+\cref{division} shows three kinds of blocks.
+How blocks like $A$, $E$, and $I$ are computed is explained in \cref{section:initial} and can be seen in \cref{start}.
+How blocks like $B$, $C$, $F$, $G$, $J$, $K$, and $E$ are computed is explained in \cref{section:diagonal} and can be seen in figures \ref{division} and \ref{twovars}.
+Blocks like $D$, $H$, and $L$ are computed like block $B$ as explained in \cref{section:lastblock}, so they will be treated no different.
 
-\fref{Algorithm}{block} is used to handle blocks $B$, $C$, $E$, and $F$.
-The variable $d$ contains the diagonals as explained in \fref{section}{section:diagonal}.
+\subsubsection{Algorithm to standard compute blocks}
+\Cref{block} is used to handle blocks like $B$, and $D$.
+Variable $d$ contains the diagonals as explained in \cref{section:diagonal}.
 The $id$ is the id of the thread.
 OpenCL allows multiple threads to execute the same algorithm in parallel.
 The id of the thread is a unique number from zero till the number of threads.
 This id is used to identify which column of the block the thread is to process.
 Variable $width$ is the width of the block.
-The width of the block is equal to the amount of thread OpenCL is using.
-Variable $height$ is the number of iterations to do.
+The width of the block is equal to the amount of threads OpenCL is using.
+Variable $height$ is the number of iterations to be executed.
 There is no limit to this number apart from the length of sequence b, as it is useless to compute more rows than present.
 Variables $s_a$ and $s_b$ are parts of sequences a and b respectively.
 The size of $s_a$ is equal to the $width$.
 The size of $s_b$ is equal to the total height of the block, so this is equal to $height + width - 1$.
 
-As seen on line 2 of \fref{algorithm}{block} each thread picks a column according to the following formula: $width - 1 - id$.
-If the $id$ would have been used to pick a column the equations on lines 5 and 10 would be ``$a$ is $s_b[width - id + i]$'' and ``$x \gets width - id + i$'' respectively, so there is no significant difference.
-Every iteration of the for loop on lines 3 to 16 consists of two parts.
-In the first part from lines 5 to 13 only read operations occur and in the second part, which is line 15, only write operations occur. \todo{correct}
-The two parts are separated by two \Call{barrier}{\relax} operations.
-These guarantee that every thread is at the same point in the program before any can continue.
-This means that no thread can be in the reading part while another is writing to the memory, thus guaranteeing that no memory inconsistencies occur during operation.
+As seen on line 2 of \cref{block} each thread picks a column according to the following formula: $width - 1 - id$.
+If the $id$ would have been used to pick a column the equations on lines 5 and 10 would be ``$a = s_b[width - id + i]$'' and ``$x \gets width - id + i$'' respectively, so there is no significant difference.
+%Every iteration of the for loop on lines 3 to 16 consists of two parts.
+%In the first part from lines 5 to 13 only read operations occur and in the second part, which is line 15, only write operations occur. \todo{correct}
 
-\begin{algorithm}[htb]
+Each iterations is separated by a \Call{barrier}{\relax} operation.
+It guarantees that every thread is at the same point in the program before any can continue.
+As $x$ is computed with the $id \cdot 2$ the $x$s at every iteration always differs with at least 2 between threads.
+This means that no thread can read a cell while another is writing in the same memory, thus guaranteeing that no memory inconsistencies occur during operation.
+
+\begin{algorithm*}[t]
 \caption{Parallel algorithm to begin pillars} \label{begin}
+\begin{multicols}{2}
 \begin{algorithmic}[1]
 \Procedure{Begin\_calc}{$id, width, s_a, s_b, \mathit{offset}_a, d$}
     \requires{$s_a \neq$ NULL}
     \requires{$s_b \neq$ NULL}
     \requires{$d \neq$ NULL}
+    \requires{$0 \leq id \And id < width$}
     \requires{$s_a.length \ge width$}
     \requires{$s_b.length \ge width$}
     \requires{$d.length \ge width \cdot 2$}
-    \requires{\Perm{$s_a[id]$}{$p$}}
-    \requires{\Forall{$i$}{$0 \le i \And i < width - id - 1$}{\Perm{$s_b[i]$}{$p$}}}
+    \requires{\Perm{$s_a[id]$}{$read$}}
+    \requires{\Forall{$i$}{$0 \le i \And i < width - id - 1$}{\Perm{$s_b[i]$}{$read$}}}
     \requires{\Forall{$i$}{$width - id \le i \And i < (width - id) \cdot 2$}{$\Perm{d[i]}{write}}$}
-    \requires{\Perm{$id \cdot 2$}{$p$}}
-    \requires{\Perm{$id \cdot 2 + 1 + height$}{$p$}}
+    \requires{\Perm{$d[width - id]$}{$read$}}
+    \requires{\Perm{$d[(width - id) \cdot 2]$}{$read$}}
+    \requires{\Perm{$d[id]$}{$write$}}
+%    \requires{$id = 0 \Rightarrow \Perm{d[width]}{read}$}
     \ensures{$d[0] = \Old{d[0]}$}
     \ensures{$d[height + width \cdot 2 - 1] = \Old{d[height + width \cdot 2 - 1]}$}
     \Statex
@@ -274,51 +295,65 @@ This means that no thread can be in the reading part while another is writing to
     \EndIf
     \Statex
     \State{$a \gets s_a[id]$}
+    \loopinv{$x = i + width - id \cdot 2$}
     \For{$i$ is $0$ \dots $width - 1$}
+        \Statex
+        \ensures{$\Perm{d[x+1]}{read} * \Perm{d[i+(id+1)\cdot2+1]}{write}$}
+        \ensures{$\Perm{d[x-1]}{read} * \Perm{d[i+(id-1)\cdot2+1]}{write}$}
         \State{\Call{barrier}{\relax}}
         \If{$id \leq i$}
+            \requires{$\Perm{d[x-1]}{read}$}
+            \requires{$\Perm{d[x+1]}{read}$}
+            \requires{$\Perm{d[x]}{write}$}
             \Statex
-            \If{$a$ is $s_b[i-id]$}
+            \If{$a = s_b[i-id]$}
                 \State{$Score \gets 0$}
             \Else
                 \State{$Score \gets 1$}
             \EndIf
+            \ensures{$a = s_b[i-id] \Leftrightarrow Score = 0$}
+            \ensures{$a \neq s_b[i-id] \Leftrightarrow Score = 1$}
             \Statex
             \State{$x \gets i + width - id \cdot 2$}
             \State{$cell\_d \gets d[x] + Score$}
             \State{$cell\_up \gets d[x - 1] + 1$}
-            \State{$cell\_left \gets d[x + 1] + 1$}
+            \State{$\mathit{cell\_left} \gets d[x + 1] + 1$}
             \Statex
-            \State{$d[x] \gets $\Call{minimum}{$cell\_up, cell\_left, cell\_d$}}
+            \State{$d[x] \gets $\Call{minimum}{$cell\_up, \mathit{cell\_left}, cell\_d$}}
+            \ensures{$d[x] = \textproc{minimum}(\Call{minimum}{d[x - 1], d[x + 1]} + 1, d[x] + Score)$}
         %\Else
         %    \State{\Call{barrier}{\relax}}
         \EndIf
     \EndFor
 \EndProcedure
 \end{algorithmic}
-\end{algorithm}
+\end{multicols}
+\end{algorithm*}
 
-\fref{Algorithm}{begin} is used to handle blocks $A$ and $D$.
-Variables $id$, $width$, $s_a$, $s_b$, and $d$ are the same as in \fref{algorithm}{block}.
+\subsubsection{Algorithm of initial blocks}
+\Cref{begin} is used to handle blocks like $A$, $E$, and $I$.
+Variables $id$, $width$, $s_a$, $s_b$, and $d$ are the same as in \cref{block}.
 Variable $\mathit{offset}_a$ is the offset of the pillar relative to sequence a, where the first element of the sequence is zero.
 
-Lines 2 to 5 fill the top row, which is row \textbf{0} in \fref{figure}{tstart}.
-Since the row is one cell wider than the width one thread has to set two cells.
-On line 6 the column of this thread is picked with its $id$.
-If the column would be $width - id - 1$ the equations on lines 9, 10, and 15 would be along the lines of ``$width - id - 1 \leq i$'', ``$a$ is $s_b[i-(width-id-1)]$'', and ``$x \gets i + width - (width - id - 1) * 2$''.
+Lines 2 to 5 fill the top row, which is row \textbf{0} in \cref{tstart}.
+Since the row is one cell wider than the width, one thread has to set two cells.
+On line 6 the character of the column being computed is loaded.
+Each thread loads the character at index $id$.
+If the index would be $width - id - 1$ the equations on lines 9, 10, and 15 would be along the lines of ``$width - id - 1 \leq i$'', ``$a$ is $s_b[i-(width-id-1)]$'', and ``$x \gets i + width - (width - id - 1) \cdot 2$''.
 These equations are longer and thus more susceptible to bugs.
 
-The lines 7 through 24 are equivalent to lines 3 to 16 in algorithm 1.
-The only difference between the two loops is that not all the threads calculate a new value in \fref{algorithm}{begin} as can be seen in figure ref{start}.
+Lines 7 through 21 are equivalent to lines 3 to 15 in algorithm 1.
+The only difference between the two loops is that not all the threads calculate a new value in \cref{begin} as can be seen in \cref{start}.
 The if statement on line 9 ensures that.
-Both the branches of the if statement contain a \Call{barrier}{\relax} statement so that all threads encounter the same amount of those statements.
-Where this not the case the behaviour of the algorithm would be undefined.
+%Both the branches of the if statement contain a \Call{barrier}{\relax} statement so that all threads encounter the same amount of those statements.
+%Where this not the case the behaviour of the algorithm would be undefined.
 
-\begin{algorithm}[htb]
+\begin{algorithm}[ht]
 \caption{Parallel algorithm to fill the first column} \label{fill_column}
 \begin{algorithmic}[1]
 \Procedure{Column\_fill}{$id,width$,$\mathit{offset}_b$,$height$,$d$}
     \requires{$d \neq$ NULL}
+    \requires{$0 \leq id \And id < width$}
     \requires{$d.length \ge width \cdot 2 + height$}
     \requires{\Forall{$x$}{$width \cdot 2 - 1 + id \leq x \cdot width + id - 1 \And x \cdot width + id - 1 \leq width + height - 1$}{\Perm{$d[x \cdot width + id - 1]$}{$write$}}}
     %\globalensures{\Forall{$x$}{$width \cdot 2 - 1 \leq i \And i \leq width + height - 1$}{\Perm{$d[i]$}{$write$}}}
@@ -337,15 +372,17 @@ Where this not the case the behaviour of the algorithm would be undefined.
 \end{algorithmic}
 \end{algorithm}
 
-There is only one column unaccounted for and that is the left most column which is column \textbf{A} in \fref{figure}{start}.
-\fref{Algorithm}{fill_column} does that while taking into the account the structure of the variable containing the diagonals.
+\subsubsection{Algorithm of initial column}
+There is only one column unaccounted for and that is the initial column as indicated in \cref{division}.
+\Cref{fill_column} does that while taking into the account the structure of the variable containing the diagonals.
 The variables $id$, $width$, $height$, and $d$ are the same as in algorithms \ref{block} and \ref{begin}.
 The variable $\mathit{offset}_b$ is the offset of the block relative to sequence b, where the first element of the sequence is zero.
 Line 2 calculates the total size of the diagonal and line 3 calculates the starting index to fill.
 The while loop on lines 4 to 7 fills each cell of the diagonal while respecting the offset of b.
 There are no \Call{barrier}{\relax} statements in this algorithm as the threads only write to the memory.
 
-With these three algorithms and the exchange of columns as described in \fref{section}{partitioning} the edit distance between two sequences of arbitrary sizes can be computed.
-The division in blocks as shown in \fref{figure}{division} allows for multiple process to work on the calculation in parallel.
-This answers the fist subquestion as stated in \fref{section}{questions}.
+\subsubsection{Conclusion}
+With these three algorithms and the exchange of columns as described in \cref{partitioning} the edit distance between two sequences of arbitrary sizes can be computed.
+The division in blocks as shown in \cref{division} allows for multiple process to work on the calculation in parallel.
+This answers the fist subquestion as stated in \cref{questions}.
 

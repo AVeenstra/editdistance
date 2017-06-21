@@ -1,5 +1,5 @@
 \section{Background}
-\todo{Correct mistakes}
+Before solving the research question a background in the topics used to solve it will be given in this section.
 
 \subsection{OpenCL}
 GPGPU programming is the use of GPUs to handle computation which traditionally is done by CPUs.
@@ -14,11 +14,12 @@ The traditional CPU-based programming models do not allow the same complex vecto
 As mentioned before OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs \cite{CUDA}.
 
 In the OpenCL architecture one CPU-based program call\-ed the \textit{Host} controls multiple GPUs and CPUs called \textit{Compute Devices}.
-Each of those compute devices consist of one or more \textit{Compute Units}, which each contain one or more \textit{Processing Elements}.
-These processing elements execute the OpenCL kernels provided by the host program.
-After such kernel has finished running the results are returned to the host program.
-The kernel on every processing element is the same, so the only way to change the outcome of the program is to modify the input of the program \cite{OpenCL}.
+Each of those compute devices consists of one or more \textit{work-groups}, of which each contains one or more \textit{work-items}.
+These \textit{work-groups} execute the OpenCL kernels provided by the host program.
+Only before and after such kernel has is running will the memory of the GPU be accessible to the \textit{host}.
+The kernel run on every \textit{work-item} is the same, but has a unique identifier (id) to allow divergent results \cite{OpenCL}.
 
+\begin{comment}
 The memory hierarchy used in OpenCL is not equal to that of the physical memory configuration on GPUs.
 This is to prevent having to take into account every type of architecture, which would be tedious work as the amount of types is quite large.
 Each of the architectural devices discussed above have their own memory, which is inaccessible to components of the same type.
@@ -26,35 +27,36 @@ Every processing element can access its own private memory, the memory of its co
 The host memory can be accessed, but it is generally slower than the on-board memory \cite{OpenCL}.
 
 The architecture and memory hierarchy already enforce the division of the algorithm if one wants to use every component of a GPU.
+\end{comment}
 
 \subsection{MPI}
 MPI is a standard specification in communication between computers which enables parallel computing.
-An implementation of this specification is freely available and will be used in this project.
-The implementation allows the transmission of multiple datatypes and messages between nodes.
-It also provides a way to identify all the connected processes and assign an identifier to each process \cite{MPI}.
-These features could help dividing the workload over all nodes.
-\todo{like forking}
+It is comparable to the traditional forking of threads in C and its derivatives, but it adds additional communication and computation functions.
+Nodes can send and receive messages both asynchronous and synchronous, read and write memory on other nodes, read and write files on other nodes, compute simple mathematical operations on variables available on each node, and much more \cite{MPI}.
+Each node runs the same program and has its own unique id, which is useful while dividing the workload among nodes.
 
 \subsection{Edit distance}
 The edit distance problem is way of measuring how much two strings differ from each other \cite{Navarro:2001:GTA:375360.375365}.
-The distance is measured by operations like inserting, removing, replacing, and rearranging characters.
+The distance is measured by the minimal number of operations like inserting, removing, replacing, and rearranging characters.
 The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
 For this project only inserting, removing, and replacing are considered.
-The operations costs are $C_i$ (insertion), $C_d$ (deletion), and $C_r$ (replacement).
+The costs of all the operations is set to 1.
+The edit distance with those conditions is also called the Levenshtein distance \cite{Navarro:2001:GTA:375360.375365}.
 
-An example input is:
-\begin{equation} \label{ed}
-\begin{split}
-S_1 &= \text{`Saturday'}\\
-S_2 &= \text{`Sunday'}\\
-C_i &= 2\\
-C_d &= 3\\
-C_r &= 4
-\end{split}
-\end{equation}
-\todo{improve and state we will be using the Levenshtein distance}
+Take for example sequence a ($s_a$) is ``kitten'' and sequence b ($s_b$) is ``sitting''.
+The distance with the given conditions is equal to 3, since there are only 3 operations required to get from one sequence to the other.
+The operations required are:
+\begin{itemize}
+    \item Replace the ``k'' with an ``s''. ``kitten'' $\rightarrow$ ``sitten''
+    \item Replace the ``e'' with an ``i''. ``sitten'' $\rightarrow$ ``sittin''
+    \item Insert ``g'' at the end. ``sittin'' $\rightarrow$ ``sitting''
+\end{itemize}
+The order of the operations is not important, as long as it is the least amount of operations.
 
-\todo{fix underfull vbox}
-
-\subsection{Specification language}
-\todo{continue}
+\subsection{Verification}
+Verification is done by describing what an algorithm requires as input and what it ensures as output.
+The language used is JML with an extension for GPGPU programs.
+Permission-based separation logic is used to guarantee no read and writes of memory occur at the same time \cite{vercors}.
+Permissions are claimed by using the $\textproc{Perm}(x, \pi)$ function, where $x$ is the memory address or memory range to claim and $\pi$ is the permissions required.
+In this paper $\pi$ is either $read$ or $write$, since no more complex constructions are required.
+Multiple work-items can share a resource with the $read$ permission, but only one can use a resource with the $write$ permission.

@@ -3,18 +3,19 @@
 \usepackage{comment} % for comment blocks
 \usepackage{mathtools} % for equation
 \usepackage[table]{xcolor} % for grey cells in tables
-\usepackage{algpseudocode} % for pseudocode
+\usepackage{multicol}
 \usepackage{algorithm} % for pseudocode
+\usepackage[pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
+\usepackage[capitalise,noabbrev,nameinlink]{cleveref}
+\usepackage{algpseudocode} % for pseudocode
 \usepackage[caption=false]{subfig} % for multiple figures in q1
 \usepackage{svg} % for svg images
-\usepackage[pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
-\usepackage{pgfplots}
+\usepackage{pgfplots} % graphs
+\usepackage{tabu}
 \pgfplotsset{compat=1.13}
 \pdfsuppresswarningpagegroup=1
 
 \newcommand\todo[1]{\textcolor{red}{Todo: #1}}
-
-\newcommand\fref[2]{\hyperref[#2]{#1 \ref*{#2}}}
 
 \def\NoNumber#1{{\def\alglinenumber##1{}\State #1}\addtocounter{ALG@line}{-1}}
 
@@ -35,6 +36,10 @@
 \algtext*{Indent}
 \algtext*{EndIndent}
 
+%\DeclareCaptionLabelFormat{cont}{#1 #2\alph{ContinuedFloat}}
+%\captionsetup[ContinuedFloat]{labelformat=cont}
+%\renewcommand\theContinuedFloat{\alph{ContinuedFloat}}
+
 \conferenceinfo{27$^{th}$ Twente Student Conference on IT}{Near future, 2017, Enschede, The Netherlands.}
 \CopyrightYear{2017}
 
@@ -52,7 +57,7 @@
 \begin{document}
 
 \maketitle
-%\begin{comment}
+
 \begin{abstract}
 In this paper, we describe the steps required to distribute a verified implementation of the edit distance problem on a GPU over a GPU-cluster using MPI and OpenCL.
 The new implementation will be verified too and the performance of the cluster will then be compared to that of a single device.
@@ -69,7 +74,6 @@ The new implementation will be verified too and the performance of the cluster w
 \input{parts/relatedwork}
 
 \input{parts/q1}
-%\end{comment}
 
 \input{parts/q2}
 
