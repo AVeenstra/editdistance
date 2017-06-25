@@ -5,15 +5,18 @@
 \usepackage[table]{xcolor} % for grey cells in tables
 \usepackage{multicol}
 \usepackage{algorithm} % for pseudocode
-\usepackage[pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
+\usepackage[hidelinks,pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
 \usepackage[capitalise,noabbrev,nameinlink]{cleveref}
 \usepackage{algpseudocode} % for pseudocode
 \usepackage[caption=false]{subfig} % for multiple figures in q1
 \usepackage{svg} % for svg images
 \usepackage{pgfplots} % graphs
 \usepackage{tabu}
+\usepackage[outline]{contour}
 \pgfplotsset{compat=1.13}
 \pdfsuppresswarningpagegroup=1
+
+\contourlength{0.15em}
 
 \newcommand\todo[1]{\textcolor{red}{Todo: #1}}
 
@@ -23,13 +26,13 @@
 \renewcommand\And{\textbf{ and }}
 \newcommand\Old[1]{\textproc{\textbackslash{}old}(#1)}
 \newcommand\Perm[2]{\textproc{Perm}(#1, #2)}
-\algnewcommand\invariant[1]{{\color{jml}\Statex{\textbf{invariant} #1}}}
-\algnewcommand\requires[1]{{\color{jml}\Statex{\textbf{requires} #1}}}
-\algnewcommand\globalrequires[1]{{\color{jml}\Statex{\textbf{global requires} #1}}}
-\algnewcommand\ensures[1]{{\color{jml}\Statex{\textbf{ensures} #1}}}
-\algnewcommand\globalensures[1]{{\color{jml}\Statex{\textbf{global ensures} #1}}}
-\algnewcommand\loopinv[1]{{\color{jml}\Statex{\textbf{loop\_invariant} #1}}}
-\algnewcommand\context[1]{{\color{jml}\Statex{\textbf{context} #1}}}
+\algnewcommand\invariant[1]{\State{{\color{jml}\textbf{invariant} #1}}}
+\algnewcommand\requires[1]{\State{{\color{jml}\textbf{requires} #1}}}
+\algnewcommand\globalrequires[1]{\State{{\color{jml}\textbf{global requires} #1}}}
+\algnewcommand\ensures[1]{\State{{\color{jml}\textbf{ensures} #1}}}
+\algnewcommand\globalensures[1]{\State{{\color{jml}\textbf{global ensures} #1}}}
+\algnewcommand\loopinv[1]{\State{{\color{jml}\textbf{loop\_invariant} #1}}}
+\algnewcommand\context[1]{\State{{\color{jml}\textbf{context} #1}}}
 \algnewcommand\Forall[3]{\textbf{(\textbackslash{}forall} #1; #2; #3)}
 \algnewcommand\Or{\textbf{or}}
 \algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
@@ -59,11 +62,11 @@
 \maketitle
 
 \begin{abstract}
-In this paper, we describe the steps required to distribute a verified implementation of the edit distance problem on a GPU over a GPU-cluster using MPI and OpenCL.
+In this paper, we describe the steps required to distribute a verified implementation of the edit distance problem on a GPU over a GPU cluster using MPI and OpenCL.
 The new implementation will be verified too and the performance of the cluster will then be compared to that of a single device.
 \end{abstract}
 
-\keywords{OpenCL, Edit distance problem, GPU-cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}
+\keywords{OpenCL, Edit distance problem, GPU cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}
 
 \input{parts/introduction}
 
@@ -83,8 +86,12 @@ The new implementation will be verified too and the performance of the cluster w
 
 \input{parts/conclusion}
 
+\newpage
+
 %\balancecolumns
+%\begin{multicols*}{2}
 \bibliographystyle{abbrv}
 \bibliography{sigproc}
+%\end{multicols*}
 
 \end{document}

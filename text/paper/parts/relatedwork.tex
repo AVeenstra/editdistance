@@ -2,12 +2,12 @@
 
 \subsection{Edit distance problem on GPU}
 As mentioned before the edit distance problem has already been implemented on a single GPU \cite{Heus}.
-This implementation also uses the operations insert, delete, and replace.
-This implementation will be improved if necessary and will probably be the base of the future implementation.
+His implementation also uses the Levenshtein distance.
+This implementation will be used as base in \cref{originalalg}.
 The result of this project could be compared to this single node implementation to calculate the difference in time required to compute the edit distance of two strings.
 
 %\balancecolumns
-\subsection{Benchmark on a GPU-cluster}
+\subsection{Benchmark on a GPU cluster}
 This is an MPI-OpenCL implementation of the LINPACK benchmark which was run on a cluster containing 49 nodes, each node containing two eight-core CPUs and four GPUs \cite{Cluster}.
-The implementation achieves 93.69 Tflops, which is 46 percent of the theoretical peak.
-It shows a successful implementation of MPI in combination with OpenCL, which is required in the future implementation of the edit distance algorithm.
+Their implementation achieves 93.69 Tflops, which is 46 percent of the theoretical peak.
+It shows a successful implementation of MPI in combination with OpenCL, which is required in the implementation of the edit distance algorithm.

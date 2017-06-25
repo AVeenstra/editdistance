@@ -57,6 +57,9 @@ The order of the operations is not important, as long as it is the least amount 
 Verification is done by describing what an algorithm requires as input and what it ensures as output.
 The language used is JML with an extension for GPGPU programs.
 Permission-based separation logic is used to guarantee no read and writes of memory occur at the same time \cite{vercors}.
+The separation logic uses simple rules to define permissions on resources like locks do in multithreaded programs, but do not have any effect on the actual program.
+It is solely used to verify multithreaded programs, to guarantee no concurrent operations occur on resources.
+
 Permissions are claimed by using the $\textproc{Perm}(x, \pi)$ function, where $x$ is the memory address or memory range to claim and $\pi$ is the permissions required.
 In this paper $\pi$ is either $read$ or $write$, since no more complex constructions are required.
 Multiple work-items can share a resource with the $read$ permission, but only one can use a resource with the $write$ permission.

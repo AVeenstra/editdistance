@@ -1,4 +1,4 @@
-\section{Using MPI}
+\section{Using MPI} \label{q2}
 Now that the algorithm is split in manageable pillars in \cref{q1}, the next step is to distribute the algorithm over a cluster.
 MPI offers various functions to simplify the distribution, but the main task will be exchanging the columns as explained in \cref{partitioning}.
 How the tasks will be divided is the first problem that will be tackled.
@@ -7,18 +7,20 @@ How the tasks will be divided is the first problem that will be tackled.
 The distribution of the workload of the edit distance problem can be done by simply passing a few messages between nodes.
 Each node needs to know which pillar it has to compute itself and then give the next node a column number of where their pillar starts.
 The next node is the node with one id higher or, if no such node exists, the node with id zero.
-After a node has finished a pillar it picks the next pillar that is has to compute itself by adding the sum of the widths of the nodes to the current column number.
+After a node has finished a pillar it picks the next pillar that it has to compute itself by adding the sum of the widths of the nodes to the current column number.
 \Cref{algorithms} explains what the width of a node is.
 The sum of those widths can easily be computed by using a cluster wide mathematical operation command available in MPI.
+Note that the distribution described here does not take into account the different speeds of GPUs.
+The impact of this deficiency is discussed in \cref{testing}.
 
 The height of the blocks can be negotiated between the nodes.
-The lowest width of the nodes is communicated to all nodes and they multiply that by a constant.
+The lowest width of the nodes is communicated to all nodes and they multiply that by an arbitrary constant.
 This constant should not be too small as the overhead of starting a run would impact the overall performance, but it should not be too big either, since not enough blocks will be available for parallel computation.
 
 After the computation is complete the node which has processed the last block should return the result.
 MPI shows the output of all the nodes, so there is no need to forward any results to a specific node.
 
-\begin{algorithm*}[t]
+\begin{algorithm*}[!htb]
 \caption{MPI control} \label{MPIalg}
 \begin{multicols}{2}
 \begin{algorithmic}[1]
@@ -42,18 +44,23 @@ MPI shows the output of all the nodes, so there is no need to forward any result
         \State{$s_a \gets$ \Call{read\_part}{$column, width$}}\label{MPIalg_getabegin}
         \State{\Call{cl\_write\_mem}{$s_a$}}\label{MPIalg_getaend}
         \Statex
-        \loopinv{\todo{continue}}
+        \loopinv{$queue\Call{.size}{\relax} \leq 2$}
         \For{$block$ is $0 \dots blocks\_num$}\label{MPIalg_forbegin}
             \If{$column \neq 0$ \textbf{and} $1 < blocks\_num - block$}\label{MPIalg_recvbegin}
+                \ensures{$queue\Call{.size}{\relax} = 2$}
                 \State{$queue$\Call{.put}{\textproc{mpi\_receive\_column}()}}\label{MPIalg_recv}
             \EndIf\label{MPIalg_recvend}
             \Statex
+            \ensures{$column\_list \neq NULL$}
             \If{$column \neq 0$}\label{MPIalg_getcolbegin}
-                 \State{$column\_list \gets queue$\Call{.pop}{$id$}}
+                \ensures{$1 < blocks\_num - block \Rightarrow queue\Call{.size}{\relax} = 1$}
+                \ensures{$1 = blocks\_num - block \Rightarrow queue\Call{.size}{\relax} = 0$}
+                \State{$column\_list \gets queue$\Call{.pop}{$id$}}
             \Else
-                 \State{$column\_list \gets $\Call{empty\_column}{\relax}}
+                \State{$column\_list \gets $\Call{empty\_column}{\relax}}
             \EndIf\label{MPIalg_getcolend}
             \Statex
+            \ensures{$height \gets \Call{min}{max\_height, s_b\_length - block \cdot max\_height}$}
             \If{$1 < blocks\_num - block$}\label{MPIalg_getheightbegin}
                 \State{$height \gets max\_height$}
             \Else
@@ -74,29 +81,26 @@ MPI shows the output of all the nodes, so there is no need to forward any result
         \State{$column \gets column + cluster\_total\_width$}\label{MPIalg_whilecount}
     \EndWhile\label{MPIalg_whileend}
 \EndProcedure
-%\algstore{MPIalgstore}
-%\end{algorithmic}
-%\end{multicols}
-%\end{algorithm*}
-%\begin{algorithm}
-%\ContinuedFloat
-%\caption{MPI control (cont.)} \label{MPIalg2}
-%\begin{algorithmic}[1]
-%\algrestore{MPIalgstore}
 \Statex
-\Function{execute\_kernel}{$max\_height$, $height$, $s_a$, $width$, $block$, $column$, $column\_next$} \label{MPIalg_functionbegin}
-    \If{$block \neq 0$}\label{MPIalg_functionifbegin}
+\Function{execute\_kernel}{$max\_height$, $height$, $s_a$, $width$, $block$, $column\_list$, $column\_next$} \label{MPIalg_functionbegin}
+    \requires{$0 < height \leq max\_height$}
+    \requires{$0 < s_a.length \leq width$}
+    \requires{$0 < block$}
+    \requires{$column\_list.length = height$}
+    \requires{$column\_next.length \leq max\_height$}
+    \Statex
+    \If{$block \neq 0$} \label{MPIalg_functionifbegin}
         \State{$diagonal\_size \gets s_a.length \cdot 2 - 1$} \label{MPIalg_diagonal_size}
         \State{\textproc{cl\_copy\_memory}(from=$max\_height$, to=$0$,}\Indent \label{MPIalg_copymem}
             \State{size=$diagonal\_size$)}\EndIndent
         \Statex
         \State{\textproc{cl\_write\_memory}(to=$diagonal\_size$,}\Indent \label{MPIalg_writecol1}
-            \State{from=$column[s_a.length - 2:]$)}\EndIndent
+            \State{from=$column\_list[s_a.length - 2:]$)}\EndIndent
         \State{$column\_size \gets max\_height - s_a.length + 2$}
         \State{\textproc{cl\_write\_memory}(to=$diagonal\_size +$}\Indent \label{MPIalg_writecol2}
             \State{$column\_size$, from=$column\_next$)}\EndIndent
     \Else
-        \State{\textproc{cl\_write\_memory}(to=$s_a.length + 1$, $column$)} \label{MPIalg_writecol3}
+        \State{\textproc{cl\_write\_memory}(to=$s_a.length + 1$, $column\_list$)} \label{MPIalg_writecol3}
         \State{\textproc{cl\_write\_memory}(to=$s_a.length + 1 +$}\Indent \label{MPIalg_writecol4}
             \State{$max\_height$, $column\_next$)}\EndIndent
     \EndIf\label{MPIalg_functionifend}
@@ -128,10 +132,10 @@ Lines \ref{MPIalg_whileifbegin} to \ref{MPIalg_whileifend} retrieve the first co
 Each iteration of the for loop retrieves another column in lines \ref{MPIalg_recvbegin} to \ref{MPIalg_recvend} before computing the block.
 This ensures that there are two columns in the queue before line \ref{MPIalg_executebegin} if the id of the process is not zero and if the process is not at the last block of the pillar.
 At the last block of a pillar no column is received, since the last block depends on only one other block.
-For example, in \cref{division} block $H$ depends only on block $D$.
+For example, in \cref{division} block $H$ depends only on block $D$, given that the diagonals used in block $G$ are still in the memory.
 The first pillar does not require the retrieval of columns from other nodes, since \cref{fill_column} can be used to fill its column.
 
-Lines \ref{MPIalg_getabegin} and \ref{MPIalg_getaend} read a chunk of $s_a$ starting from $column$ and store it in the memory of the GPU.
+Lines \ref{MPIalg_getabegin} and \ref{MPIalg_getaend} read a chunk of sequence $a$ starting from $column$ and store it in the memory of the GPU.
 The size of this chunk is the number of characters read up to the $width$, so if there are not enough characters left in $s_a$ the width of the chunk is equal to $s_a\_length - column$.
 
 The for loop on lines \ref{MPIalg_forbegin} to \ref{MPIalg_forend} iterates through all the blocks of the pillar, where the first and second block are considered as one.
@@ -139,7 +143,7 @@ For example, in \cref{division} blocks $A$ and $B$ are considered as one.
 Lines \ref{MPIalg_recvbegin} to \ref{MPIalg_getheightend} retrieve the variables required to execute the kernel on line \ref{MPIalg_executebegin}.
 Lines \ref{MPIalg_sendbegin} to \ref{MPIalg_sendend} handle the result of the kernel.
 
-As mentioned earlier the if statement lines \ref{MPIalg_recvbegin} through \ref{MPIalg_recvend} manages the retrieval of columns from other nodes.
+As mentioned earlier the if statement in lines \ref{MPIalg_recvbegin} through \ref{MPIalg_recvend} manages the retrieval of columns from other nodes.
 Line \ref{MPIalg_recv} is executed if the process is not dealing with the first pillar and if it is not computing the final block of a pillar.
 
 Lines \ref{MPIalg_getcolbegin} to \ref{MPIalg_getcolend} get a column if needed.
@@ -160,23 +164,23 @@ As mentioned before MPI will handle the redirection of the output of a node to t
 
 \subsubsection{Excuting the kernel}
 The code on lines \ref{MPIalg_functionbegin} to \ref{MPIalg_functionend} shows the steps required to run the kernel.
-The the kernel will execute a combination of algorithms which can be found in \cref{algorithms}.
+The kernel will execute a combination of algorithms which can be found in \cref{algorithms}.
 %The combination depends on the $column$ and $block$ variables.
 In the first pillar \cref{fill_column} is first executed.
 In the first block of any pillar \cref{begin} is executed next.
 And at last \cref{block} is executed.
 Note that for the combination of blocks $A$ and $B$ of \cref{division} algorithms \ref{fill_column}, \ref{begin}, and \ref{block} will be executed.
 
-Lines \ref{MPIalg_functionifbegin} till \ref{MPIalg_functionifend} shows what memory operations on the GPU are required to run kernel.
-What operations are executed depend on which block is being processed.
-If it is not the first block the diagonals from the last run is moved to the start of the variable on line \ref{MPIalg_copymem}.
-Then he column retrieve from the previous node it's written to the memory after the diagonals, where the column skips the first characters.
+Lines \ref{MPIalg_functionifbegin} till \ref{MPIalg_functionifend} show what memory operations on the GPU are required to run kernel.
+What memory operations are executed depend on which block is being processed.
+If it is not the first block the array of the diagonals from the last run is moved to the start of the variable on line \ref{MPIalg_copymem}.
+Then the column retrieved from the previous node is written to the memory after the diagonals, where the column skips the first characters.
 This is done on line \ref{MPIalg_writecol1}.
 The number of characters skipped of this column is equal to the size of the width minus two.
 After that the following column is also appended in the memory on line \ref{MPIalg_writecol2}.
 The copying of the second column is required because the block being processed depends on two columns.
 
-If the the process is at the first block of a pillar there is no need to copy the diagonals as the new block will be using \cref{begin}.
+If the process is at the first block of a pillar there is no need to copy the diagonals as the new block will be using \cref{begin}.
 Only the writing of the columns is necessary.
 This is done on lines \ref{MPIalg_writecol3} and \ref{MPIalg_writecol4}.
 
@@ -184,7 +188,9 @@ To keep the performance of the program decent the number of blocks in a column s
 There is however a lower limit on the height of a block because of line \ref{MPIalg_copymem}.
 If the diagonals at the end of a run overlap with the position where the diagonals are copied to an error will be encountered.
 This can be solved by buffering the copy, but this brings too much overhead.
-As this only happens if the sequences are small it is better to run the problem on a single node as \cref{testing} will point out.
+As this only happens if the sequences are small, it is better to run the problem on a single node as \cref{testing} will point out.
 That is why the program will simply refuse computing the edit distance between two too short sequences on a cluster.
+It will not fall back to compute the problem on a single node to eliminate any confusion on how many nodes were actually used to solve the problem.
+
 The formula to compute the minimum sequence size is $2 \cdot diagonal\_size$, where the $diagonal\_size$ is equal to $s_a.length \cdot 2 - 1$ as line \ref{MPIalg_diagonal_size} shows.
 The width of a pillar on one node used for testing was 1024, so sequences run on a cluster including that node will refuse any sequence size smaller than $2 \cdot (1024 \cdot 2 - 1) = 4094$.

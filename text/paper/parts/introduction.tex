@@ -2,12 +2,12 @@
 As the amount of data increases the need for parallel computation does so too, but this is no small feat.
 Multiple ways exist to process data in parallel, but one of the most efficient ways to do this is to use the Graphical Processing Unit (GPU).
 A GPU enables the parallel execution of a single operation on multiple variables, unlike the Common Processing Unit (CPU) which only allows for the execution of a single operation on a single value.
-Even if the CPU has multiple cores the amount of data processed in parallel is generally still inferior to that of a GPU.
+Even if the CPU has multiple cores the maximum amount of data processed in parallel is generally still inferior to that of a GPU.
 
 To decrease the processing time even further a logical step is to increase the number of GPUs \cite{Cluster}.
 One could add more GPUs to their computer, but this is not a scalable solution since most motherboards only support a limited amount of GPUs.
 Another solution would be to make multiple devices work together, each containing at least one GPU.
-This is called a GPU-cluster.
+This is called a GPU cluster.
 
 Various algorithms have already been implemented on a single GPU device and were verified \cite{Heus}.
 The verification of a program is important since it can guarantee the result of an algorithm is always correct without fail.
@@ -28,7 +28,7 @@ One standard which has been around for years is the Message Passing Interface (M
 This interface will be used to distribute the algorithm on multiple (multi-)GPU nodes.
 A successful program using MPI and OpenCL has already been made \cite{Cluster}, so it should be possible to make a MPI-OpenCL implementation of the edit distance problem.
 
-By implementing the edit distance problem on a GPU-cluster instead of a single GPU the processing time could be reduced as the performance of a cluster exceeds that of a single unit \cite{Cluster}.
-The goal of this research is to implement the edit distance problem on a GPU-cluster using MPI and verify this implementation.
+By implementing the edit distance problem on a GPU cluster instead of a single GPU the processing time could be reduced as the performance of a cluster exceeds that of a single unit \cite{Cluster}.
+The goal of this research is to implement the edit distance problem on a GPU cluster using MPI and verify this implementation.
 This goal results in the research question mentioned in the following section.
 
