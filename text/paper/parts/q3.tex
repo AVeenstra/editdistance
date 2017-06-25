@@ -1,5 +1,5 @@
 \section{Verifying the implementation} \label{q3}
-In \crefrange{block}{MPIalg} verification has been added in the form of ensures and requires.
+In \crefrange{block}{MPIalg} verification has been added in the form of \textit{ensures} and \textit{requires}.
 Most of the lines are trivial or explained in \cref{algorithms}.
 Nontrivial lines will be explained in this section.
 
@@ -24,11 +24,11 @@ This is described in line 5.
 
 \subsection{MPI Algorithm \ref*{MPIalg}}
 As the nodes in a cluster only communicate the right most columns of blocks no concurrent variable manipulation can occur.
-Therefore permission-based separation logic is not required for this algorithm.
+Therefore, permission-based separation logic is not required for this algorithm.
 There are no circular dependencies, so no deadlocks can occur.
-This cuts down the need for verification even further, leaving only trivial requirements and ensures.
+This cuts down the need for verification even further, leaving only trivial \textit{requires} and \textit{ensures} statements.
 
 \subsection{Verification with VerCors}
-Unfortunately OpenCL is not sufficiently supported by VerCors to do automatic verification.
+Unfortunately, OpenCL is not sufficiently supported by VerCors to do automatic verification.
+\todo{The PVL language}
 In further research support could be built into VerCors, but in the mean time the manual verification provided in \crefrange{block}{MPIalg} will have to do.
-

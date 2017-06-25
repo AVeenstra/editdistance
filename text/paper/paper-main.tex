@@ -18,7 +18,7 @@
 
 \contourlength{0.15em}
 
-\newcommand\todo[1]{\textcolor{red}{Todo: #1}}
+\newcommand\todo[1]{\textcolor{red}{Todo: #1\ref*{todo}}}
 
 \def\NoNumber#1{{\def\alglinenumber##1{}\State #1}\addtocounter{ALG@line}{-1}}
 
@@ -62,8 +62,9 @@
 \maketitle
 
 \begin{abstract}
-In this paper, we describe the steps required to distribute a verified implementation of the edit distance problem on a GPU over a GPU cluster using MPI and OpenCL.
-The new implementation will be verified too and the performance of the cluster will then be compared to that of a single device.
+In this paper, we describe a verified implementation of the Levenshtein distance problem on a GPU cluster using MPI and OpenCL.
+The implementation will be based on an existing verified single GPU implementation.
+The speed of the implementation is higher on a cluster, but the efficiency is affected by the overhead caused by the extra communication between nodes. \todo{ask}
 \end{abstract}
 
 \keywords{OpenCL, Edit distance problem, GPU cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}

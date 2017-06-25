@@ -15,21 +15,21 @@
 \section{Testing the performance} \label{testing}
 The implementation has been tested on a cluster of two nodes.
 %The test will compare the performance of each single node to the performance of the nodes working together.
-%Therefore the exact specifications of the nodes will not be discussed, as the nodes will not be compared nodes to each other.%
-Node 1 has an Nvidia GPU with a maximum work-group size of 1024 and Node 2 has an AMD GPU with a maximum work-group size of 256.
+%Therefore, the exact specifications of the nodes will not be discussed, as the nodes will not be compared nodes to each other.%
+Node 1 has an Nvidia GPU with a maximum work-group size of 1024 and Node 2 has an AMD GPU with a maximum work-group size of 256. \todo{specs?}
 That means that the $width$, as discussed in \cref{algorithms}, are 1024 and 256 on Nodes 1 and 2 respectively.
 The implementation has been run on the nodes separately and on the nodes as a cluster.
 This allows us to compare the time the program needs to return the result.
 The values used in figures \ref{result_graph_total} and \ref{result_graph_cell_total} are averages of ten separate runs.
-The x-axes represents the product of the lengths of the sequences compared, which is equal to the number of cells in the solution matrix as mentioned in \cref{originalalg}.
-The y-axes represents the average time it takes to solve the problem in \cref{result_graph_total} and the average time it takes for one cell to be computed in \cref{result_graph_cell_total}.
+The x-axis represents the product of the lengths of the sequences compared, which is equal to the number of cells in the solution matrix as mentioned in \cref{originalalg}.
+The y-axis represents the average time it takes to solve the problem in \cref{result_graph_total} and the average time it takes for one cell to be computed in \cref{result_graph_cell_total}.
 
 \Cref{result_graph_total} shows that the implementation works faster on a cluster than on the individual nodes if the number of cells becomes larger than approximately $0.4 \cdot 10^{10}$ cells.
 It also shows that Node 2 takes longer than Node 1 to solve the problem.
 This is due to the fact that the width of Node 2 is smaller than the width of Node 1.
-If the number of cells is equal to $1.0 \cdot 10^{10}$ Node 1 takes 10.5 seconds to complete, Node 2 takes 47.2 seconds to complete and the cluster takes 9.8 seconds to complete.
-The width used in Node 1 is four times as big as the width in Node 2, but the time required to solve the problem is 4.50 times as long.
-Therefore we can conclude that Node 2 will be the bottleneck in the cluster.
+If the number of cells is equal to $1.0 \cdot 10^{10}$, Node 1 takes $10.5$ seconds to complete, Node 2 takes $47.2$ seconds to complete and the cluster takes $9.8$ seconds to complete.
+The width used in Node 1 is $4$ times as big as the width in Node 2, but the time required to solve the problem is $4.50$ times as long.
+Therefore, we can conclude that Node 2 will be the bottleneck in the cluster.
 The implementation does not take into account the difference in performance between nodes, so Node 2 defines the maximum performance of the cluster.
 
 The total width of the cluster is equal to $1024 + 256 = 1280$, and the width of Node 2 is 256.
@@ -37,6 +37,10 @@ So Node 2 is going to handle $256 / 1280 = \frac{1}{5}$ of the pillars.
 That means that the time the cluster should take is at least one fifth of the time it takes Node 2 to solve the problem.
 There is however a small difference between $47.2 / 5.0 = 9.44$ and $9.8$.
 This is probably due to the fact that the use of a cluster takes more time to setup and the communication provides some overhead.
+
+The theoretical optimal speed of the cluster is $(1/10.5 + 1/47.2)^{-1} = 8.59$, which is $12\%$ faster than the actual speed.
+This theoretical speed does not include the extra time to setup the cluster.
+\Cref{future} will discus optimisations required to approach this theoretical speed.
 
 The setup taking more time can be seen in \cref{result_graph_cell_total}.
 These graphs show the time taken per cell, so extra time taken independent of the number of cells will be visible in these graphs.
@@ -47,12 +51,11 @@ From these results we can conclude that optimal number of GPUs in a cluster depe
 For the specific cluster used in this section $0.4 \cdot 10^{10}$ cells is the size when the cluster is faster than the individual nodes.
 The cluster will however never be more efficient than the individual nodes, as the overhead on a cluster persist no matter the size of the cluster.
 This means that the user should consider whether or not the superior speed outweighs the inferior efficiency.
-\todo{max performance}
 
 \subsection{Comparison of algorithms}
-Comparison with the algorithm of De Heus is not useful, since it can not solve the edit distance of sequences longer than the $width$ of a node \cite{Heus}.
+Comparison with the algorithm of De Heus is not useful, since it cannot solve the edit distance of sequences longer than the $width$ of a node \cite{Heus}.
 The implementation of this paper does not focus on such small sequences, as extra complexity and features results in a significant overhead while computing them.
-It is save to say that for comparing small sequences the algorithm of De Heus is more suitable.
+It is save to say that for comparing small sequences the algorithm of De Heus is more suitable, as it does not suffer from the same overhead.
 
 
 \begin{comment}

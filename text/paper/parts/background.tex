@@ -10,13 +10,13 @@ The number of cores on a GPU is generally much higher than a CPU has, so a GPU c
 One programming language allowing the developer to run programs on a GPU is OpenCL.
 OpenCL allows a developer to run a kernel on a GPU or CPU \cite{OpenCL}.
 It is a low level programming language which can run on most GPUs and CPUs and allows general purpose parallel programming across both CPUs and GPUs.
-The traditional CPU-based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3d graphics API such as OpenGL.
-As mentioned before OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs \cite{CUDA}.
+The traditional CPU based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3d graphics API such as OpenGL.
+As mentioned before, OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs \cite{CUDA}.
 
-In the OpenCL architecture one CPU-based program call\-ed the \textit{Host} controls multiple GPUs and CPUs called \textit{Compute Devices}.
-Each of those compute devices consists of one or more \textit{work-groups}, of which each contains one or more \textit{work-items}.
+In the OpenCL architecture one CPU based program call\-ed the \textit{Host} controls multiple GPUs and CPUs called \textit{Compute Devices}.
+Each of those \textit{Compute Devices} consists of one or more \textit{work-groups}, of which each contains one or more \textit{work-items}.
 These \textit{work-groups} execute the OpenCL kernels provided by the host program.
-Only before and after such kernel has is running will the memory of the GPU be accessible to the \textit{host}.
+Only before and after such kernel is running will the memory of the GPU be accessible to the \textit{Host}.
 The kernel run on every \textit{work-item} is the same, but has a unique identifier (id) to allow divergent results \cite{OpenCL}.
 
 \begin{comment}
@@ -35,11 +35,11 @@ It is comparable to the traditional forking of threads in C and its derivatives,
 Nodes can send and receive messages both asynchronous and synchronous, read and write memory on other nodes, read and write files on other nodes, compute simple mathematical operations on variables available on each node, and much more \cite{MPI}.
 Each node runs the same program and has its own unique id, which is useful while dividing the workload among nodes.
 
-\subsection{Edit distance}
+\subsection{Edit distance}\label{bed}
 The edit distance problem is way of measuring how much two strings differ from each other \cite{Navarro:2001:GTA:375360.375365}.
 The distance is measured by the minimal number of operations like inserting, removing, replacing, and rearranging characters.
 The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
-For this project only inserting, removing, and replacing are considered.
+In the existing implementation by De Heus \cite{Heus} and in the new implementation only inserting, removing, and replacing are considered.
 The costs of all the operations is set to 1.
 The edit distance with those conditions is also called the Levenshtein distance \cite{Navarro:2001:GTA:375360.375365}.
 

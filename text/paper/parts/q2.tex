@@ -100,7 +100,8 @@ MPI shows the output of all the nodes, so there is no need to forward any result
         \State{\textproc{cl\_write\_memory}(to=$diagonal\_size +$}\Indent \label{MPIalg_writecol2}
             \State{$column\_size$, from=$column\_next$)}\EndIndent
     \Else
-        \State{\textproc{cl\_write\_memory}(to=$s_a.length + 1$, $column\_list$)} \label{MPIalg_writecol3}
+        \State{\textproc{cl\_write\_memory}(to=$s_a.length + 1$,}\Indent \label{MPIalg_writecol3}
+            \State{ $column\_list$)}\EndIndent
         \State{\textproc{cl\_write\_memory}(to=$s_a.length + 1 +$}\Indent \label{MPIalg_writecol4}
             \State{$max\_height$, $column\_next$)}\EndIndent
     \EndIf\label{MPIalg_functionifend}
@@ -143,11 +144,11 @@ For example, in \cref{division} blocks $A$ and $B$ are considered as one.
 Lines \ref{MPIalg_recvbegin} to \ref{MPIalg_getheightend} retrieve the variables required to execute the kernel on line \ref{MPIalg_executebegin}.
 Lines \ref{MPIalg_sendbegin} to \ref{MPIalg_sendend} handle the result of the kernel.
 
-As mentioned earlier the if statement in lines \ref{MPIalg_recvbegin} through \ref{MPIalg_recvend} manages the retrieval of columns from other nodes.
+As mentioned earlier, the if statement in lines \ref{MPIalg_recvbegin} through \ref{MPIalg_recvend} manages the retrieval of columns from other nodes.
 Line \ref{MPIalg_recv} is executed if the process is not dealing with the first pillar and if it is not computing the final block of a pillar.
 
 Lines \ref{MPIalg_getcolbegin} to \ref{MPIalg_getcolend} get a column if needed.
-As mentioned before the first pillar does not require a column from other nodes, so an empty list is used instead for the first pillar.
+As mentioned before, the first pillar does not require a column from other nodes, so an empty list is used instead for the first pillar.
 
 Lines \ref{MPIalg_getheightbegin} to \ref{MPIalg_getheightend} get the height of the block which is to be processed.
 Only the height of the last block of each pillar is smaller than the $max\_height$.
@@ -160,7 +161,7 @@ If the process is not at the last pillar the column will be send to the next nod
 Again, the next node is the node with one id higher or, if no such node exists, the node with id zero.
 If the process is at the last block of the last pillar the result of the problem can be found in the column.
 This result is printed to the standard output.
-As mentioned before MPI will handle the redirection of the output of a node to the output of the parent call.
+As mentioned before, MPI will handle the redirection of the output of a node to the output of the parent call.
 
 \subsubsection{Excuting the kernel}
 The code on lines \ref{MPIalg_functionbegin} to \ref{MPIalg_functionend} shows the steps required to run the kernel.
@@ -186,11 +187,12 @@ This is done on lines \ref{MPIalg_writecol3} and \ref{MPIalg_writecol4}.
 
 To keep the performance of the program decent the number of blocks in a column should be at least 4, so that multiple blocks can be computed in parallel on multiple nodes.
 There is however a lower limit on the height of a block because of line \ref{MPIalg_copymem}.
-If the diagonals at the end of a run overlap with the position where the diagonals are copied to an error will be encountered.
+If the diagonals at the end of a run overlap with the position where the diagonals are copied to, an error will be encountered.
 This can be solved by buffering the copy, but this brings too much overhead.
 As this only happens if the sequences are small, it is better to run the problem on a single node as \cref{testing} will point out.
 That is why the program will simply refuse computing the edit distance between two too short sequences on a cluster.
 It will not fall back to compute the problem on a single node to eliminate any confusion on how many nodes were actually used to solve the problem.
 
-The formula to compute the minimum sequence size is $2 \cdot diagonal\_size$, where the $diagonal\_size$ is equal to $s_a.length \cdot 2 - 1$ as line \ref{MPIalg_diagonal_size} shows.
+The formula to compute the minimum sequence size is $2 \cdot diagonal\_size$.
+The $diagonal\_size$ is equal to $s_a.length \cdot 2 - 1$ as line \ref{MPIalg_diagonal_size} shows.
 The width of a pillar on one node used for testing was 1024, so sequences run on a cluster including that node will refuse any sequence size smaller than $2 \cdot (1024 \cdot 2 - 1) = 4094$.

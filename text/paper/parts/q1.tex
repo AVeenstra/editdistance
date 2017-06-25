@@ -72,16 +72,16 @@ If the blocks where squares, as De Heus suggested \cite{Heus}, the amount of cel
 The amount of cells processed increases or decreases by 1 every iteration, so the average amount of cells processed is approximately $width/2$ cells processed in parallel.
 Blocks like $B$ and $K$ on the other hand have an average amount of cells processed in parallel of exactly $width$.
 The only disadvantage of this approach is that the top and bottom of each pillar blocks like $A$ and $D$ exist, but the overall performance is still better.
-Therefore the pillars will be constructed diagonally to optimise the amount of cells processed in parallel at any given time.
+Therefore, the pillars will be constructed diagonally to optimise the amount of cells processed in parallel at any given time.
 
 \subsection{Storing the diagonals} \label{section:diagonal}
-As mentioned before two diagonals are required to calculate the following diagonal.
-Unfortunately OpenCL offers no support for an array of arrays, so either the two diagonals must be saved in separate variables or they must be combined in one larger array.
+As mentioned before, two diagonals are required to calculate the following diagonal.
+Unfortunately, OpenCL offers no support for an array of arrays, so either the two diagonals must be saved in separate variables or they must be combined in one larger array.
 Using two variables limits the freedom while implementing the algorithm as the rows must be swapped after each iteration.
 Using a single combined array requires the calculation of indices each time the algorithm accesses the array.
 The two solutions are not significantly different, so another factor should be considered before opting for one of the two solutions.
 The most common blocks are shaped like $B$, $C$, $F$, etc.
-Therefore the rest of this section will only consider the algorithm required to process those blocks.
+Therefore, the rest of this section will only consider the algorithm required to process those blocks.
 
 \begin{figure}[p]
     \centering
@@ -93,7 +93,7 @@ Therefore the rest of this section will only consider the algorithm required to 
 An input the algorithm for processing a block should digest is the left column and it should output the right most column of the block.
 The two diagonals should evolve, but the size should stay constant.
 In the two variables solution the column values could be divided between and appended to the two diagonals.
-This requires some prepossessing as the even indices of the column should be appended to one diagonal and the odd indices to the other as shown in \cref{twovarsinput}.
+This requires some preprocessing as the even indices of the column should be appended to one diagonal and the odd indices to the other as shown in \cref{twovarsinput}.
 Some post-processing is also required to retrieve the column after processing as shown in \cref{twovarsoutput}.
 A solution to this problem is to transfer the parts of diagonals a and b as is.
 The pre- and post-processing steps cancel each other out, so there is no need to do so.
@@ -112,7 +112,7 @@ The blocks of memory can be transferred to another process as is, just as in the
 
 We can conclude that there are no significant advantages or disadvantages to either solution.
 The single variable solution is only slightly more attractive since there is one less variable to worry about.
-Therefore the single variable solution will be chosen in the algorithms hereafter mentioned.
+Therefore, the single variable solution will be chosen in the algorithms mentioned in \cref{algorithms}.
 
 The calculation of indices depends on the iteration count of the algorithm.
 The formula used to get the index of the diagonal to change is $i + n \cdot 2 + 1$ where $i$ is the number of iterations completed and $n$ is the index of the cell in the diagonal.
@@ -129,7 +129,7 @@ The top cell of the lines are stored on index zero and the bottom cell is stored
 This direction has been chosen to make debugging easier as the resulting column will be in the first cells of the diagonal after the run, making them easier to find and compare to known results.
 There is no other advantage or disadvantage if the result is stored the other way around.
 \Cref{singlevar} also shows this same orientation.
-The where the input is equivalent to the left most column as seen in $D1$ and the output equivalent to the right most column in $D2$.
+The input is equivalent to the left most column as seen in $D1$ and the output equivalent to the right most column in $D2$.
 
 %As can be seen in the figure the total size of the diagonal is $total_block_height + width + 1$.
 %In this case the $total_block_height$ is $19$ the $width$ is $10$, so the size of the diagonal is $30$.
@@ -244,7 +244,7 @@ How blocks like $A$, $E$, and $I$ are computed is explained in \cref{section:ini
 How blocks like $B$, $C$, $F$, $G$, $J$, $K$, and $E$ are computed is explained in \cref{section:diagonal} and can be seen in figures \ref{division} and \ref{twovars}.
 Blocks like $D$, $H$, and $L$ are computed like block $B$ as explained in \cref{section:lastblock}, so they will be treated no different.
 
-\subsubsection{Algorithm to standard compute blocks}
+\subsubsection{Algorithm to compute standard blocks}
 \Cref{block} is used to handle blocks like $B$, and $D$.
 Variable $d$ contains the diagonals as explained in \cref{section:diagonal}.
 The $id$ is the id of the thread.

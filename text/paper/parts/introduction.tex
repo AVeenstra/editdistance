@@ -1,5 +1,7 @@
 \section{Introduction}
-As the amount of data increases the need for parallel computation does so too, but this is no small feat.
+In recent history the amount of available data has increased, as faster computers acquire more information at a higher rate.
+As the amount of data increases the need for parallel computation does so too to process said data.
+This, however, is no small feat.
 Multiple ways exist to process data in parallel, but one of the most efficient ways to do this is to use the Graphical Processing Unit (GPU).
 A GPU enables the parallel execution of a single operation on multiple variables, unlike the Common Processing Unit (CPU) which only allows for the execution of a single operation on a single value.
 Even if the CPU has multiple cores the maximum amount of data processed in parallel is generally still inferior to that of a GPU.
@@ -10,13 +12,14 @@ Another solution would be to make multiple devices work together, each containin
 This is called a GPU cluster.
 
 Various algorithms have already been implemented on a single GPU device and were verified \cite{Heus}.
-The verification of a program is important since it can guarantee the result of an algorithm is always correct without fail.
+The verification of a program is important since it can guarantee the outcome of an algorithm is always correct.
 If one wants to distribute a verified implementation over multiple nodes additional steps have to be taken to ensure the implementation is still mathematically correct.
-Those steps will be explored while distributing a verified implementation of the edit distance problem.
+Those steps will be explored while distributing a verified implementation of the edit distance problem, which has been developed by De Heus \cite{Heus}.
 
 The edit distance problem is used in various fields of research \cite{Navarro:2001:GTA:375360.375365}.
 Fields such as Computational Biology, Signal Processing, and Text Retrieval.
 It is used to compare two strings or sequences of data, such as genome sequences.
+\todo{\Cref{bed} will explain what the problem goes. }
 
 The existing implementation of the edit distance problem uses a dynamic programming algorithm, which is well-suited for general-purpose computing on GPUs (GPGPU).
 The implementation was written in C++ using OpenCL, which can run on most GPUs \cite{Kronos:conformant}.
