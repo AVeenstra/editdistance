@@ -10,6 +10,7 @@
     ymajorgrids=true,
     grid style=dashed,
     scaled x ticks={real:10000000000},
+    width=0.45\linewidth,
 ]
 
 
@@ -40,11 +41,11 @@
 \addplot[
     color=black,
     mark=none,
-] coordinates {(0,9e-10) (0,1.4e-09) (12500000000,1.4e-09) (12500000000,9e-10) (0,9e-10)};
+] coordinates {(0,9e-10) (0,1.4e-09) (12000000000,1.4e-09) (12000000000,9e-10) (0,9e-10)};
 
 \pgfplotsset{
     after end axis/.code={
-        \node[above] at (axis cs:12500000000,1.4e-09){\contour{white}{Fig. \ref{result_graph_cell_zoom}}};
+        \node[above] at (axis cs:12000000000,1.4e-09){\contour{white}{Fig. \ref{result_graph_cell_zoom}}};
     }
 }
 

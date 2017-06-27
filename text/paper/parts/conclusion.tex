@@ -1,7 +1,7 @@
 \section{Conclusion}
 The steps required to distribute the verified implementation of the edit distance are described in \crefrange{q1}{q3}.
 The first step is explained in \cref{q1}, which is the division of the algorithm as shown in \cref{division}.
-The second step is explained in explained in \cref{q2}, which is the distribution of the pillars among nodes and the communication between the nodes.
+The second step is explained in \cref{q2}, which is the distribution of the pillars among nodes and the communication between the nodes.
 Finally, \cref{q3} explains the verification of the new algorithms used in the previous two steps.
 The three steps answer the first three subquestions mentioned in \cref{questions}.
 Together they answer the research question mentioned in the same section.
@@ -10,16 +10,21 @@ The final subquestion is answered in \Cref{testing}, which discusses the perform
 %It concludes that the speed of the implementation on a cluster is superior to the speed of the implementation o
 
 \subsection{Future work on the implementation} \label{future}
+\Cref{ver:vercors} explains that VerCors offers insufficient support for OpenCL.
+A solution would be to improve the tool so that all functionality of OpenCL can be used.
+The code of the implementation described in this paper could be used as a simple test.
+Once the tool supports OpenCL any ambiguities or inconsistencies can be fixed in the implementation.
+
 There are certain optimisations possible for the MPI algorithm.
 As mentioned in \cref{testing}, one node can be the bottleneck of a cluster.
 This can be solved by either using the same hardware for every node, or to dynamically divide the work load between nodes.
 The dynamic division should allow nodes to negotiate what their tasks will be.
 
 Another optimisation is the use of the CPU parallel to the GPU.
-The OpenCL algorithms can be converted to a CPU implementation so that it can help solving the edit distance problem.
+The OpenCL algorithms can be converted to a CPU implementation so that it can help solve the edit distance problem.
 
 The OpenCL algorithms could also be optimised.
 The memory used could be limited by using the algorithm of Meyers \cite{Meyers}.
 The advantage is that the columns shared between nodes takes less space, so the overhead for sending and receiving the columns should be reduced.
-However a disadvantage is that the algorithm of Meyers requires extra operations per cell and thus reduces the performance of the algorithms.
-Therefore, the overall performance of the implementation is not quaranteed to be better than the current implementation.
+However, a disadvantage is that the algorithm of Meyers requires extra operations per cell and thus reduces the performance of the algorithms.
+Therefore, the overall performance of the implementation is not guaranteed to be better than the current implementation.

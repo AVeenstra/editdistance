@@ -1,7 +1,7 @@
 \section{Dividing the algorithm} \label{q1}
 To answer this question we must first explore the limitations and potential improvements of the previous implementation.
 The limitations will then be discussed and solved if possible in the following subsections.
-In the final subsection the algorithms used will described.
+In the final subsection the algorithms used will be described.
 
 \subsection{Original algorithm} \label{originalalg}
 The algorithm of De Heus uses a dynamic programming solution \cite{Heus}.
@@ -23,7 +23,7 @@ H_{(i,j)} & = \min \begin{cases}
 where $Score$ is zero if the characters of the compared sequences at index $i$ and $j$ are equal; otherwise, $Score$ is one.
 
 The value of $H_{(i,j)}$ depends on the cells $H_{(i-1,j)}$, $H_{(i,j-1)}$, and $H_{(i-1,j-1)}$.
-This limits the use of parallelism to speed up the computation, but it leaves an opening none the less.
+This limits the use of parallelism to speed up the computation, but it leaves an opening nonetheless.
 There is no dependency between cells $H_{(a,b)}$ if $a + b$ is constant.
 The grey cells in \cref{diagonal} are such a group of cells which can be calculated in parallel.
 Each diagonal is based on the previous two diagonals, because of the dependencies previously mentioned \cite{Meyers}.
@@ -66,7 +66,7 @@ The dependencies of the individual cells are inherited by the individual blocks.
 Just like the cells the blocks can also be calculated in parallel if they are not dependent of one another.
 Block $D$ and $F$ are such blocks as they only require block $B$ and $C$.
 With larger sequences the number of independent blocks becomes more significant.
-As a result the calculation of multiple blocks in parallel becomes more attractive.
+As a result, the calculation of multiple blocks in parallel becomes more attractive.
 
 If the blocks where squares, as De Heus suggested \cite{Heus}, the amount of cells processed in parallel would start at $1$, continue to $width$, and go back to $1$.
 The amount of cells processed increases or decreases by 1 every iteration, so the average amount of cells processed is approximately $width/2$ cells processed in parallel.
@@ -177,6 +177,8 @@ Both share the same property of having three consecutive cells defining the midd
 The obvious difference being the amount of cell being processed each iteration.
 In the following section you will find the algorithm to compute this block.
 
+\input{parts/alg_block}
+
 \subsection{Computation of the last block} \label{section:lastblock}
 At the bottom of every pillar there is a block with a flat base.
 In \cref{division} $D$, $H$, and $L$ are such blocks.
@@ -185,64 +187,12 @@ However, this poses no problem as both the result and the output column are inde
 Thus blocks $D$, $H$, and $L$ will be treated the same way as blocks like $B$.
 The only difference is the number of iterations required to get the right most column of the block.
 
-\begin{algorithm*}[!ht]
-\caption{Parallel algorithm to process blocks} \label{block}
-\begin{multicols}{2}
-\begin{algorithmic}[1]
-\Procedure{Block\_calc}{$id, width, s_a, s_b, height, d$}
-    \requires{$s_a \neq$ NULL}
-    \requires{$s_b \neq$ NULL}
-    \requires{$d \neq$ NULL}
-    \requires{$0 \leq id \And id < width$}
-    \requires{$s_a.length \ge width$}
-    \requires{$s_b.length \ge width + height$}
-    \requires{$d.length \ge width \cdot 2 + height$}
-    \requires{\Perm{$s_a[width - 1 - id]$}{$read$}}
-    \requires{\Forall{$i$}{$id \le i \And i < id + height$}{\Perm{$s_b[i]$}{$read$}}}
-    \requires{\Forall{$i$}{$id \cdot 2 + 1 \le i \And i < id \cdot 2 + 1 + height$}{$\Perm{d[i]}{write}}$}
-    \requires{\Perm{$d[id \cdot 2]$}{$read$}}
-    \requires{\Perm{$d[id \cdot 2 + 1 + height]$}{$read$}}
-    \ensures{$d[0] = \Old{d[0]}$}
-    \ensures{$d[height + width \cdot 2 - 1] = \Old{d[height + width \cdot 2 - 1]}$}
-    \Statex
-    \State{$a \gets s_a[width - 1 - id]$}\label{block:a}
-    \Statex
-    \loopinv{$x = i + id \cdot 2 + 1$}
-    \For{$i$ is $0 \dots height$}\label{block:forbegin}
-        \requires{$\Perm{d[x-1]}{read}$}
-        \requires{$\Perm{d[x+1]}{read}$}
-        \requires{$\Perm{d[x]}{write}$}
-        \Statex
-        \ensures{$\Perm{d[x+1]}{read} * \Perm{d[i+(id+1)\cdot2+1]}{write}$}
-        \ensures{$\Perm{d[x-1]}{read} * \Perm{d[i+(id-1)\cdot2+1]}{write}$}
-        \State{\Call{barrier}{\relax}}\label{block:barrier}
-        \Statex
-        \If{$a = s_b[id + i]$}\label{block:ifscorebegin}
-            \State $Score \gets 0$
-        \Else
-            \State $Score \gets 1$
-        \EndIf\label{block:ifscoreend}
-        \ensures{$a = s_b[id + i] \Leftrightarrow Score = 0$}
-        \ensures{$a \neq s_b[id + i] \Leftrightarrow Score = 1$}
-        \Statex
-        \State{$x \gets i + id \cdot 2 + 1$}\label{block:x}
-        \State{$cell\_d \gets d[x] + Score$}\label{block:d}
-        \State{$cell\_up \gets d[x - 1] + 1$}\label{block:up}
-        \State{$\mathit{cell\_left} \gets d[x + 1] + 1$}\label{block:left}
-        \Statex
-        \State{$d[x] \gets $\Call{minimum}{$cell\_up, \mathit{cell\_left}, cell\_d$}}\label{block:write}
-        \ensures{$d[x] = \textproc{minimum}(\Call{minimum}{d[x - 1], d[x + 1]} + 1, d[x] + Score)$}
-    \EndFor\label{block:forend}
-\EndProcedure
-\end{algorithmic}
-\end{multicols}
-\end{algorithm*}
-
 \subsection{The OpenCL algorithms} \label{algorithms}
 \cref{division} shows three kinds of blocks.
 How blocks like $A$, $E$, and $I$ are computed is explained in \cref{section:initial} and can be seen in \cref{start}.
 How blocks like $B$, $C$, $F$, $G$, $J$, $K$, and $E$ are computed is explained in \cref{section:diagonal} and can be seen in figures \ref{division} and \ref{twovars}.
-Blocks like $D$, $H$, and $L$ are computed like block $B$ as explained in \cref{section:lastblock}, so they will be treated no different.
+Blocks like $D$, $H$, and $L$ are computed like block $B$ as explained in \cref{section:lastblock}, so they will not be treated differently.
+\Crefrange{block}{fill_column} contain JML specifications in green, which will be discussed in \crefrange{ver:block}{ver:fill_column}.
 
 \subsubsection{Algorithm to compute standard blocks}
 \Cref{block} is used to handle blocks like $B$, and $D$.
@@ -254,89 +204,27 @@ This id is used to identify which column of the block the thread is to process.
 Variable $width$ is the width of the block.
 The width of the block is equal to the amount of threads OpenCL is using.
 Variable $height$ is the number of iterations to be executed.
-There is no limit to this number apart from the length of sequence b, as it is useless to compute more rows than present.
-Variables $s_a$ and $s_b$ are parts of sequences a and b respectively.
+There is no limit to this number apart from the length of sequence $b$, as it is useless to compute more rows than present.
+Variables $s_a$ and $s_b$ are parts of sequences $a$ and $b$ respectively.
 The size of $s_a$ is equal to the $width$.
 The size of $s_b$ is equal to the total height of the block, so this is equal to $height + width - 1$.
 
 As seen on line \ref{block:a} of \cref{block} each thread picks a column according to the following formula: $width - 1 - id$.
-If the $id$ would have been used to pick a column the equations on lines \ref{block:ifscorebegin} and \ref{block:x} would be ``$a = s_b[width - id + i]$'' and ``$x \gets width - id + i$'' respectively, so there is no significant difference.
+If the $id$ had been used to pick a column the equations on lines \ref{block:ifscorebegin} and \ref{block:x} would be ``$a = s_b[width - id + i]$'' and ``$x \gets width - id + i$'' respectively, so there is no significant difference.
 %Every iteration of the for loop on lines 3 to 16 consists of two parts.
 %In the first part from lines 5 to 13 only read operations occur and in the second part, which is line 15, only write operations occur. \todo{correct}
 
 Each iteration is separated by a \Call{barrier}{\relax} operation on line \ref{block:barrier}.
 It guarantees that every thread is at the same point in the program before any can continue.
-As $x$ is computed with the $id \cdot 2$ the $x$s at every iteration always differs with at least 2 between threads.
+As $x$ is computed with the $id \cdot 2$, the $x$s at every iteration always differs with at least 2 between threads.
 This means that no thread can read a cell while another is writing in the same memory, thus guaranteeing that no memory inconsistencies occur during operation.
 
-\begin{algorithm*}[t]
-\caption{Parallel algorithm to begin pillars} \label{begin}
-\begin{multicols}{2}
-\begin{algorithmic}[1]
-\Procedure{Begin\_calc}{$id, width, s_a, s_b, \mathit{offset}_a, d$}
-    \requires{$s_a \neq$ NULL}
-    \requires{$s_b \neq$ NULL}
-    \requires{$d \neq$ NULL}
-    \requires{$0 \leq id \And id < width$}
-    \requires{$s_a.length \ge width$}
-    \requires{$s_b.length \ge width$}
-    \requires{$d.length \ge width \cdot 2$}
-    \requires{\Perm{$s_a[id]$}{$read$}}
-    \requires{\Forall{$i$}{$0 \le i \And i < width - id - 1$}{\Perm{$s_b[i]$}{$read$}}}
-    \requires{\Forall{$i$}{$width - id \le i \And i < (width - id) \cdot 2$}{$\Perm{d[i]}{write}}$}
-    \requires{\Perm{$d[width - id]$}{$read$}}
-    \requires{\Perm{$d[(width - id) \cdot 2]$}{$read$}}
-    \requires{\Perm{$d[id]$}{$write$}}
-%    \requires{$id = 0 \Rightarrow \Perm{d[width]}{read}$}
-    \ensures{$d[0] = \Old{d[0]}$}
-    \ensures{$d[height + width \cdot 2 - 1] = \Old{d[height + width \cdot 2 - 1]}$}
-    \Statex
-    \State{$d[id] \gets \mathit{offset}_a + width - id$}\label{begin:fillbegin}
-    \Statex
-    \If{$id$ is $0$}
-        \State{$d[width] \gets \mathit{offset}_a$}\label{begin:zero}
-    \EndIf\label{begin:fillend}
-    \Statex
-    \State{$a \gets s_a[id]$}\label{begin:a}
-    \loopinv{$x = i + width - id \cdot 2$}
-    \For{$i$ is $0$ \dots $width - 1$}\label{begin:forbegin}
-        \Statex
-        \ensures{$\Perm{d[x+1]}{read} * \Perm{d[i+(id+1)\cdot2+1]}{write}$}
-        \ensures{$\Perm{d[x-1]}{read} * \Perm{d[i+(id-1)\cdot2+1]}{write}$}
-        \State{\Call{barrier}{\relax}}\label{begin:barrier}
-        \If{$id \leq i$}\label{begin:ifbegin}
-            \requires{$\Perm{d[x-1]}{read}$}
-            \requires{$\Perm{d[x+1]}{read}$}
-            \requires{$\Perm{d[x]}{write}$}
-            \Statex
-            \If{$a = s_b[i-id]$}\label{begin:scoreifbegin}
-                \State{$Score \gets 0$}
-            \Else
-                \State{$Score \gets 1$}
-            \EndIf\label{begin:scoreifend}
-            \ensures{$a = s_b[i-id] \Leftrightarrow Score = 0$}
-            \ensures{$a \neq s_b[i-id] \Leftrightarrow Score = 1$}
-            \Statex
-            \State{$x \gets i + width - id \cdot 2$}\label{begin:x}
-            \State{$cell\_d \gets d[x] + Score$}\label{begin:d}
-            \State{$cell\_up \gets d[x - 1] + 1$}\label{begin:up}
-            \State{$\mathit{cell\_left} \gets d[x + 1] + 1$}\label{begin:left}
-            \Statex
-            \State{$d[x] \gets $\Call{minimum}{$cell\_up, \mathit{cell\_left}, cell\_d$}}\label{begin:write}
-            \ensures{$d[x] = \textproc{minimum}(\Call{minimum}{d[x - 1], d[x + 1]} + 1, d[x] + Score)$}
-        %\Else
-        %    \State{\Call{barrier}{\relax}}
-        \EndIf\label{begin:ifend}
-    \EndFor\label{begin:forend}
-\EndProcedure
-\end{algorithmic}
-\end{multicols}
-\end{algorithm*}
+\input{parts/alg_begin}
 
 \subsubsection{Algorithm of initial blocks}
 \Cref{begin} is used to handle blocks like $A$, $E$, and $I$.
 Variables $id$, $width$, $s_a$, $s_b$, and $d$ are the same as in \cref{block}.
-Variable $\mathit{offset}_a$ is the offset of the pillar relative to sequence a, where the first element of the sequence is zero.
+Variable $\mathit{offset}_a$ is the offset of the pillar relative to sequence $a$, where the first element of the sequence is zero.
 
 Lines \ref{begin:fillbegin} to \ref{begin:fillend} fill the top row, which is row \textbf{0} in \cref{tstart}.
 Since the row is one cell wider than the width, one thread has to set two cells.
@@ -351,35 +239,13 @@ The if statement on line \ref{begin:ifbegin} ensures that.
 %Both the branches of the if statement contain a \Call{barrier}{\relax} statement so that all threads encounter the same amount of those statements.
 %Where this not the case the behaviour of the algorithm would be undefined.
 
-\begin{algorithm}[ht]
-\caption{Parallel algorithm to fill the first column} \label{fill_column}
-\begin{algorithmic}[1]
-\Procedure{Column\_fill}{$id,width$,$\mathit{offset}_b$,$height$,$d$}
-    \requires{$d \neq$ NULL}
-    \requires{$0 \leq id \And id < width$}
-    \requires{$d.length \ge width \cdot 2 + height$}
-    \requires{\Forall{$x$}{$width \cdot 2 - 1 + id \leq x \cdot width + id - 1 \And x \cdot width + id - 1 \leq width + height - 1$}{\Perm{$d[x \cdot width + id - 1]$}{$write$}}}
-    %\globalensures{\Forall{$x$}{$width \cdot 2 - 1 \leq i \And i \leq width + height - 1$}{\Perm{$d[i]$}{$write$}}}
-    \ensures{\Forall{$x$}{$width \cdot 2 - 1 + id \leq x \cdot width + id - 1 \And x \cdot width + id - 1 \leq width + height - 1$}{$d[x \cdot width + id - 1] = (x - 1) \cdot width + id - 1 + \mathit{offset}_b$}}
-    %\globalensures{\Forall{$x$}{$width \cdot 2 - 1 \leq i \And i \leq width + height - 1$}{$d[i] = i - width + \mathit{offset}_b$}}
-    \Statex
-    \State{$total\_size \gets width + height - 1$}\label{fill_column:total_size}
-    \State{$i \gets width \cdot 2 - 1 + id$}\label{fill_column:i}
-    \Statex
-    \loopinv{$(i - 1 + id) \textbf{ mod } width = 0$}
-    \While{$i \leq total\_size$}\label{fill_column:whilebegin}
-        \State{$d[i] \gets i - width + \mathit{offset}_b$}\label{fill_column:write}
-        \State{$i \gets i + width$}\label{fill_column:whilei}
-    \EndWhile\label{fill_column:whileend}
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
+\input{parts/alg_fill_column}
 
 \subsubsection{Algorithm of initial column}
 There is only one column unaccounted for and that is the initial column as indicated in \cref{division}.
 \Cref{fill_column} does that while taking into the account the structure of the variable containing the diagonals.
 The variables $id$, $width$, $height$, and $d$ are the same as in Algorithms \ref{block} and \ref{begin}.
-The variable $\mathit{offset}_b$ is the offset of the block relative to sequence b, where the first element of the sequence is zero.
+The variable $\mathit{offset}_b$ is the offset of the block relative to sequence $b$, where the first element of the sequence is zero.
 Line \ref{fill_column:total_size} calculates the total size of the diagonal and line \ref{fill_column:i} calculates the starting index to fill.
 The while loop on lines \ref{fill_column:whilebegin} to \ref{fill_column:whileend} fills each cell of the diagonal while respecting the offset of b.
 There are no \Call{barrier}{\relax} statements in this algorithm as the threads only write to the memory.

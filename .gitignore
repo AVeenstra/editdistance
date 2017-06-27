@@ -4,6 +4,7 @@
 *.aux
 *.backup
 *.bak
+*.brf
 *.exe
 *.dll
 *.dylib

@@ -1,8 +1,8 @@
 \section{Background}
-Before solving the research question a background in the topics used to solve it will be given in this section.
+Before solving the research question, a background on the topics used to solve it will be given in this section.
 
 \subsection{OpenCL}
-GPGPU programming is the use of GPUs to handle computation which traditionally is done by CPUs.
+GPGPU programming is the use of GPUs to handle computations which traditionally are done by CPUs.
 A CPU consists of one or more cores allowing Single Instructions streams and a Single Data stream (SISD).
 A GPU on the other hand has a Single Instruction stream and Multiple Data streams (SIMD).
 The number of cores on a GPU is generally much higher than a CPU has, so a GPU can process more data in parallel using its SIMD architecture.
@@ -11,13 +11,13 @@ One programming language allowing the developer to run programs on a GPU is Open
 OpenCL allows a developer to run a kernel on a GPU or CPU \cite{OpenCL}.
 It is a low level programming language which can run on most GPUs and CPUs and allows general purpose parallel programming across both CPUs and GPUs.
 The traditional CPU based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3d graphics API such as OpenGL.
-As mentioned before, OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs \cite{CUDA}.
+As mentioned before, OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs~\cite{CUDA}.
 
 In the OpenCL architecture one CPU based program call\-ed the \textit{Host} controls multiple GPUs and CPUs called \textit{Compute Devices}.
 Each of those \textit{Compute Devices} consists of one or more \textit{work-groups}, of which each contains one or more \textit{work-items}.
 These \textit{work-groups} execute the OpenCL kernels provided by the host program.
 Only before and after such kernel is running will the memory of the GPU be accessible to the \textit{Host}.
-The kernel run on every \textit{work-item} is the same, but has a unique identifier (id) to allow divergent results \cite{OpenCL}.
+Each \textit{work-item} has a unique identifier (id) to allow for different results, even though the same kernel runs on every \textit{work-item} \cite{OpenCL}.
 
 \begin{comment}
 The memory hierarchy used in OpenCL is not equal to that of the physical memory configuration on GPUs.
@@ -30,7 +30,7 @@ The architecture and memory hierarchy already enforce the division of the algori
 \end{comment}
 
 \subsection{MPI}
-MPI is a standard specification in communication between computers which enables parallel computing.
+MPI is a standard specification for communication between computers which enables parallel computing.
 It is comparable to the traditional forking of threads in C and its derivatives, but it adds additional communication and computation functions.
 Nodes can send and receive messages both asynchronous and synchronous, read and write memory on other nodes, read and write files on other nodes, compute simple mathematical operations on variables available on each node, and much more \cite{MPI}.
 Each node runs the same program and has its own unique id, which is useful while dividing the workload among nodes.
@@ -38,12 +38,15 @@ Each node runs the same program and has its own unique id, which is useful while
 \subsection{Edit distance}\label{bed}
 The edit distance problem is way of measuring how much two strings differ from each other \cite{Navarro:2001:GTA:375360.375365}.
 The distance is measured by the minimal number of operations like inserting, removing, replacing, and rearranging characters.
+One use for the distance is to find DNA or RNA subsequences after possible mutations.
+Another use offer suggestions for misspelled words, as words a shorter distance from the misspelled are more likely to be a correct replacement.
+
 The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
 In the existing implementation by De Heus \cite{Heus} and in the new implementation only inserting, removing, and replacing are considered.
 The costs of all the operations is set to 1.
 The edit distance with those conditions is also called the Levenshtein distance \cite{Navarro:2001:GTA:375360.375365}.
 
-Take for example sequence a ($s_a$) is ``kitten'' and sequence b ($s_b$) is ``sitting''.
+Take for example sequence $a$ ($s_a$) as ``kitten'' and sequence $b$ ($s_b$) as ``sitting''.
 The distance with the given conditions is equal to 3, since there are only 3 operations required to get from one sequence to the other.
 The operations required are:
 \begin{itemize}
@@ -53,12 +56,15 @@ The operations required are:
 \end{itemize}
 The order of the operations is not important, as long as it is the least amount of operations.
 
+As mentioned before, the edit distance problem has already been implemented on a single GPU by De Heus \cite{Heus}.
+His implementation also uses the Levenshtein distance and is used as base in \cref{originalalg}.
+As explained in \cref{compare}, the performance of the new implementation will not be compared to the performance of this single GPU implementation.
+
 \subsection{Verification}
 Verification is done by describing what an algorithm requires as input and what it ensures as output.
-The language used is JML with an extension for GPGPU programs.
-Permission-based separation logic is used to guarantee no read and writes of memory occur at the same time \cite{vercors}.
+The language used is JML with an extension for Permission-based separation logic, which is used to guarantee no read and writes of memory occur at the same time~\cite{vercors}.
 The separation logic uses simple rules to define permissions on resources like locks do in multithreaded programs, but do not have any effect on the actual program.
-It is solely used to verify multithreaded programs, to guarantee no concurrent operations occur on resources.
+It is solely used to verify multithreaded programs, to guarantee no concurrent operations occur on resources. \todo{extend}
 
 Permissions are claimed by using the $\textproc{Perm}(x, \pi)$ function, where $x$ is the memory address or memory range to claim and $\pi$ is the permissions required.
 In this paper $\pi$ is either $read$ or $write$, since no more complex constructions are required.

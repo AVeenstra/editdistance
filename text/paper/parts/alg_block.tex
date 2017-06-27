@@ -1,0 +1,52 @@
+\begin{algorithm*}[!ht]
+\caption{Parallel algorithm to process blocks} \label{block}
+\begin{multicols}{2}
+\begin{algorithmic}[1]
+\Procedure{Block\_calc}{$id, width, s_a, s_b, height, d$}
+    \requires{$s_a \neq$ NULL}
+    \requires{$s_b \neq$ NULL}
+    \requires{$d \neq$ NULL}
+    \requires{$0 \leq id \And id < width$}
+    \requires{$s_a.length \ge width$}
+    \requires{$s_b.length \ge width + height$}
+    \requires{$d.length \ge width \cdot 2 + height$}
+    \requires{\Perm{$s_a[width - 1 - id]$}{$read$}}
+    \requires{\Forall{$i$}{$id \le i \And i < id + height$}{\Perm{$s_b[i]$}{$read$}}}
+    %\requires{\Forall{$i$}{$id \cdot 2 + 1 \le i \And i < id \cdot 2 + 1 + height$}{$\Perm{d[i]}{write}}$}
+    %\requires{\Perm{$d[id \cdot 2]$}{$read$}}
+    %\requires{\Perm{$d[id \cdot 2 + 1 + height]$}{$read$}}
+    \ensures{$d[0] = \Old{d[0]}$}
+    \ensures{$d[height + width \cdot 2 - 1] = \Old{d[height + width \cdot 2 - 1]}$}
+    \Statex
+    \State{$a \gets s_a[width - 1 - id]$}\label{block:a}
+    \Statex
+    \loopinv{$x = i + id \cdot 2 + 1$}
+    \For{$i$ is $0 \dots height$}\label{block:forbegin}
+        \requires{$\Perm{d[x-1]}{read}$}
+        \requires{$\Perm{d[x+1]}{read}$}
+        \requires{$\Perm{d[x]}{write}$}
+        \Statex
+        \ensures{$\Perm{d[x+1]}{read} * \Perm{d[i+(id+1)\cdot2+1]}{write}$}
+        \ensures{$\Perm{d[x-1]}{read} * \Perm{d[i+(id-1)\cdot2+1]}{write}$}
+        \State{\Call{barrier}{\relax}} \label{block:barrier}\todo{fix}
+        \Statex
+        \If{$a = s_b[id + i]$}\label{block:ifscorebegin}
+            \State $Score \gets 0$
+        \Else
+            \State $Score \gets 1$
+        \EndIf\label{block:ifscoreend}
+        \ensures{$a = s_b[id + i] \Leftrightarrow Score = 0$}
+        \ensures{$a \neq s_b[id + i] \Leftrightarrow Score = 1$}
+        \Statex
+        \State{$x \gets i + id \cdot 2 + 1$}\label{block:x}
+        \State{$cell\_d \gets d[x] + Score$}\label{block:d}
+        \State{$cell\_up \gets d[x - 1] + 1$}\label{block:up}
+        \State{$\mathit{cell\_left} \gets d[x + 1] + 1$}\label{block:left}
+        \Statex
+        \State{$d[x] \gets $\Call{minimum}{$cell\_up, \mathit{cell\_left}, cell\_d$}}\label{block:write}
+        \ensures{$d[x] = \textproc{minimum}(\Call{minimum}{d[x - 1], d[x + 1]} + 1, d[x] + Score)$}
+    \EndFor\label{block:forend}
+\EndProcedure
+\end{algorithmic}
+\end{multicols}
+\end{algorithm*}

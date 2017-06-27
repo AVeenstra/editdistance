@@ -11,16 +11,18 @@
 \usepackage[caption=false]{subfig} % for multiple figures in q1
 \usepackage{svg} % for svg images
 \usepackage{pgfplots} % graphs
-\usepackage{tabu}
+\usepackage{tabu} % awesome table
+\usepackage{float}
 \usepackage[outline]{contour}
+
 \pgfplotsset{compat=1.13}
 \pdfsuppresswarningpagegroup=1
 
 \contourlength{0.15em}
 
-\newcommand\todo[1]{\textcolor{red}{Todo: #1\ref*{todo}}}
+\newcommand\todo[1]{\textcolor{red}{Todo: #1\ref*{:#1}}}
 
-\def\NoNumber#1{{\def\alglinenumber##1{}\State #1}\addtocounter{ALG@line}{-1}}
+%\def\NoNumber#1{{\def\alglinenumber##1{}\State #1}\addtocounter{ALG@line}{-1}}
 
 \definecolor{jml}{rgb}{0.1,0.3,0.1}
 \renewcommand\And{\textbf{ and }}
@@ -28,11 +30,13 @@
 \newcommand\Perm[2]{\textproc{Perm}(#1, #2)}
 \algnewcommand\invariant[1]{\State{{\color{jml}\textbf{invariant} #1}}}
 \algnewcommand\requires[1]{\State{{\color{jml}\textbf{requires} #1}}}
-\algnewcommand\globalrequires[1]{\State{{\color{jml}\textbf{global requires} #1}}}
+\algnewcommand\globalrequires[1]{\State{{\color{jml}\textbf{kernel requires} #1}}}
 \algnewcommand\ensures[1]{\State{{\color{jml}\textbf{ensures} #1}}}
-\algnewcommand\globalensures[1]{\State{{\color{jml}\textbf{global ensures} #1}}}
+\algnewcommand\globalensures[1]{\State{{\color{jml}\textbf{kernel ensures} #1}}}
 \algnewcommand\loopinv[1]{\State{{\color{jml}\textbf{loop\_invariant} #1}}}
 \algnewcommand\context[1]{\State{{\color{jml}\textbf{context} #1}}}
+\algnewcommand\JML[1]{\State{{\color{jml}#1}}}
+\algnewcommand\JMLx[1]{\Statex{{\color{jml}#1}}}
 \algnewcommand\Forall[3]{\textbf{(\textbackslash{}forall} #1; #2; #3)}
 \algnewcommand\Or{\textbf{or}}
 \algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
@@ -48,14 +52,28 @@
 
 \title{Edit distance on GPU clusters using MPI}
 
+\newcommand\me{Antoine Veenstra}
+
 \numberofauthors{1}
 \author{
-    \alignauthor Antoine Veenstra\\
+    \alignauthor \me\\
     \affaddr{University of Twente}\\
     \affaddr{P.O. Box 217, 7500AE Enschede}\\
     \affaddr{The Netherlands}\\
     \email{a.j.veenstra@student.utwente.nl}
 }
+
+\makeatletter
+\hypersetup{
+    pdftitle={\@title},
+    pdfauthor={\me},
+    pdftoolbar=false,        % show Acrobat’s toolbar?
+    pdfmenubar=false,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdfkeywords={OpenCL, Edit distance problem, Levenshtein distance problem, GPU cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}, % list of keywords
+}
+\makeatother
 
 \begin{document}
 
@@ -63,11 +81,11 @@
 
 \begin{abstract}
 In this paper, we describe a verified implementation of the Levenshtein distance problem on a GPU cluster using MPI and OpenCL.
-The implementation will be based on an existing verified single GPU implementation.
-The speed of the implementation is higher on a cluster, but the efficiency is affected by the overhead caused by the extra communication between nodes. \todo{ask}
+The implementation is based on an existing verified single GPU implementation.
+The speed of the implementation is higher on a cluster, but the efficiency is affected by the overhead, which is caused by the extra communication between nodes.
 \end{abstract}
 
-\keywords{OpenCL, Edit distance problem, GPU cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}
+\keywords{OpenCL, Edit distance problem, Levenshtein distance problem, GPU cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}
 
 \input{parts/introduction}
 
@@ -75,7 +93,7 @@ The speed of the implementation is higher on a cluster, but the efficiency is af
 
 \input{parts/background}
 
-\input{parts/relatedwork}
+%\input{parts/relatedwork}
 
 \input{parts/q1}
 
@@ -87,7 +105,7 @@ The speed of the implementation is higher on a cluster, but the efficiency is af
 
 \input{parts/conclusion}
 
-\newpage
+%\newpage
 
 %\balancecolumns
 %\begin{multicols*}{2}

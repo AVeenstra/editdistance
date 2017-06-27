@@ -1,34 +1,36 @@
 \section{Verifying the implementation} \label{q3}
 In \crefrange{block}{MPIalg} verification has been added in the form of \textit{ensures} and \textit{requires}.
+The verification guarantees that the memory is not
 Most of the lines are trivial or explained in \cref{algorithms}.
-Nontrivial lines will be explained in this section.
+Non-trivial lines will be explained in this section. \todo{memory verification}
 
-\subsection{OpenCL Algorithm \ref*{block}}
+\subsection{OpenCL Algorithm \ref*{block}} \label{ver:block}
 In \cref{block} line 11 describes that every work-item requires writes to a range of the array of diagonals.
-This is however not at the same time as another work-item, as lines 22 and 23 ensure.
+This is however not at the same time as another work-item, as lines 22 and 23 ensure. \todo{fix linenumbers}
 
 Lines 14 and 15 refer to the fact that the first and last cells in the array of diagonals are not edited.
 This is visible in \Cref{singlevar}.
 
 Lines 19 to 21 shows that every work-item requires read permissions on the cells left and right of the cell updated.
-Since the difference of the $x$s between two consecutive threads is 2 no threads should have read permissions on a cell with write permissions of another work-item.
+Since the difference of the $x$s between two consecutive threads is 2, no threads should have read permissions on a cell with write permissions of another work-item.
 This is ensured by the barrier on line \ref{begin:barrier}, as can be read on lines 22 and 23.
 
-\subsection{OpenCL Algorithm \ref*{begin}}
+\subsection{OpenCL Algorithm \ref*{begin}} \label{ver:begin}
 The explanation of the previous section also holds up for \cref{begin}.
 The if statement on line \ref{begin:ifbegin} only helps with the enforcement of permissions as less work-items process cells at the same time.
 
-\subsection{OpenCL Algorithm \ref*{fill_column}}
+\subsection{OpenCL Algorithm \ref*{fill_column}} \label{ver:fill_column}
 Verification of \cref{fill_column} is trivial, as no work-item requires read permissions and no write permissions overlap.
 This is described in line 5.
 
-\subsection{MPI Algorithm \ref*{MPIalg}}
-As the nodes in a cluster only communicate the right most columns of blocks no concurrent variable manipulation can occur.
+\input{parts/graphs}
+
+\subsection{MPI Algorithm \ref*{MPIalg}} \label{ver:MPIalg}
+As the nodes in a cluster only communicate the right most columns of blocks, no concurrent variable manipulation can occur.
 Therefore, permission-based separation logic is not required for this algorithm.
 There are no circular dependencies, so no deadlocks can occur.
 This cuts down the need for verification even further, leaving only trivial \textit{requires} and \textit{ensures} statements.
 
-\subsection{Verification with VerCors}
+\subsection{Verification with VerCors} \label{ver:vercors}
 Unfortunately, OpenCL is not sufficiently supported by VerCors to do automatic verification.
-\todo{The PVL language}
 In further research support could be built into VerCors, but in the mean time the manual verification provided in \crefrange{block}{MPIalg} will have to do.
