@@ -24,7 +24,7 @@ Another optimisation is the use of the CPU parallel to the GPU.
 The OpenCL algorithms can be converted to a CPU implementation so that it can help solve the edit distance problem.
 
 The OpenCL algorithms could also be optimised.
-The memory used could be limited by using the algorithm of Meyers \cite{Meyers}.
+The memory used could be limited by using the algorithm of Meyers~\cite{Meyers}.
 The advantage is that the columns shared between nodes takes less space, so the overhead for sending and receiving the columns should be reduced.
 However, a disadvantage is that the algorithm of Meyers requires extra operations per cell and thus reduces the performance of the algorithms.
 Therefore, the overall performance of the implementation is not guaranteed to be better than the current implementation.

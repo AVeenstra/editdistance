@@ -1,15 +1,14 @@
-\begin{algorithm}[ht]
+\begin{algorithm}[!ht]
 \caption{Parallel algorithm to fill the first column} \label{fill_column}
 \begin{algorithmic}[1]
 \Procedure{Column\_fill}{$id,width$,$\mathit{offset}_b$,$height$,$d$}
+    \globalrequires{\Forallx{$x$}{$width \cdot 2 - 1 \leq x < width + height - 1$}{\Perm{$d[x]$}{$write$}}} \label{fill_column:dall}
     \requires{$d \neq$ NULL}
     \requires{$0 \leq id \And id < width$}
     \requires{$d.length \ge width \cdot 2 + height$}
-    \requires{\Forall{$x$}{$width \cdot 2 - 1 + id \leq x \cdot width + id - 1 \And x \cdot width + id - 1 \leq width + height - 1$}{\Perm{$d[x \cdot width + id - 1]$}{$write$}}}
-    %\globalensures{\Forall{$x$}{$width \cdot 2 - 1 \leq i \And i \leq width + height - 1$}{\Perm{$d[i]$}{$write$}}}
+    \requires{\Forallx{$x$}{$width \cdot 2 - 1 + id \leq x \cdot width + id - 1 \And x \cdot width + id - 1 \leq width + height - 1$}{\Perm{$d[x \cdot width + id - 1]$}{$write$}}} \label{fill_column:did}
     \ensures{\Forall{$x$}{$width \cdot 2 - 1 + id \leq x \cdot width + id - 1 \And x \cdot width + id - 1 \leq width + height - 1$}{$d[x \cdot width + id - 1] = (x - 1) \cdot width + id - 1 + \mathit{offset}_b$}}
     %\globalensures{\Forall{$x$}{$width \cdot 2 - 1 \leq i \And i \leq width + height - 1$}{$d[i] = i - width + \mathit{offset}_b$}}
-    \Statex
     \State{$total\_size \gets width + height - 1$}\label{fill_column:total_size}
     \State{$i \gets width \cdot 2 - 1 + id$}\label{fill_column:i}
     \Statex

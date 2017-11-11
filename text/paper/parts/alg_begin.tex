@@ -1,8 +1,11 @@
-\begin{algorithm*}[t]
+\begin{algorithm}[!ht]%*}[!ht]
 \caption{Parallel algorithm to begin pillars} \label{begin}
-\begin{multicols}{2}
+%\begin{multicols}{2}
 \begin{algorithmic}[1]
 \Procedure{Begin\_calc}{$id, width, s_a, s_b, \mathit{offset}_a, d$}
+    \globalrequires{\Forallx{$t$}{$0 \leq t < width$}{\Perm{$s_a[t]$}{$read$}}}
+    \globalrequires{\Forallx{$i$}{$0 \leq i < width - 2$}{\Perm{$s_b[i]$}{$read$}}}
+    \globalrequires{\Forallx{$i$}{$0 \leq i \leq width$}{\Perm{$d[i]$}{$read$}}} \label{begin:dall}
     \requires{$s_a \neq$ NULL}
     \requires{$s_b \neq$ NULL}
     \requires{$d \neq$ NULL}
@@ -11,28 +14,24 @@
     \requires{$s_b.length \ge width$}
     \requires{$d.length \ge width \cdot 2$}
     \requires{\Perm{$s_a[id]$}{$read$}}
-    \requires{\Forall{$i$}{$0 \le i \And i < width - id - 1$}{\Perm{$s_b[i]$}{$read$}}}
-%    \requires{\Forall{$i$}{$width - id \le i \And i < (width - id) \cdot 2$}{$\Perm{d[i]}{write}}$}
-%    \requires{\Perm{$d[width - id]$}{$read$}}
-%    \requires{\Perm{$d[(width - id) \cdot 2]$}{$read$}}
-%    \requires{\Perm{$d[id]$}{$write$}}
-%    \requires{$id = 0 \Rightarrow \Perm{d[width]}{read}$}
+    \requires{\Perm{$d[id]$}{$write$}}  \label{begin:did}
+    \requires{$id = 0 \Rightarrow \Perm{d[width]}{write}$}  \label{begin:dwidth}
     \ensures{$d[0] = \Old{d[0]}$}
     \ensures{$d[height + width \cdot 2 - 1] = \Old{d[height + width \cdot 2 - 1]}$}
     \Statex
     \State{$d[id] \gets \mathit{offset}_a + width - id$}\label{begin:fillbegin}
-    \Statex
-    \If{$id$ is $0$}
+    \If{$id = 0$}
         \State{$d[width] \gets \mathit{offset}_a$}\label{begin:zero}
     \EndIf\label{begin:fillend}
-    \Statex
     \State{$a \gets s_a[id]$}\label{begin:a}
     \loopinv{$x = i + width - id \cdot 2$}
     \For{$i$ is $0$ \dots $width - 1$}\label{begin:forbegin}
-        \Statex
-        \ensures{$\Perm{d[x+1]}{read} * \Perm{d[i+(id+1)\cdot2+1]}{write}$}
-        \ensures{$\Perm{d[x-1]}{read} * \Perm{d[i+(id-1)\cdot2+1]}{write}$}
-        \State{\Call{barrier}{\relax}} \label{begin:barrier} \todo{fix}
+        \requires{$i = 0 \Rightarrow \Perm{d[id]}{write}$} \label{begin:barrier:did}
+        \requires{$i = 0 \And id = 0 \Rightarrow \Perm{d[width]}{$ $read}$} \label{begin:barrier:dwidth}
+        \requires{$i \neq 0 \Rightarrow \Perm{d[x-2]}{read} * \Perm{d[x-1]}{write} * \Perm{d[x]}{read}$} \label{begin:barrier:requires}
+        \ensures{$\Perm{d[x-1]}{read} * \Perm{d[x]}{$ $write} * \Perm{d[x+1]}{read}$} \label{begin:barrier:ensures}
+        \globalensures{\Forallx{$t$}{$0 \leq t \leq i$}{$\Perm{d[i + width - id \cdot 2 - 1]}{read} * \Perm{d[i + width - id \cdot 2]}{write} * \Perm{d[i + width - id \cdot 2 + 1]}{read}$}} \label{begin:barrier:global}
+        \State{\Call{barrier}{\relax}} \label{begin:barrier}
         \If{$id \leq i$}\label{begin:ifbegin}
             \requires{$\Perm{d[x-1]}{read}$}
             \requires{$\Perm{d[x+1]}{read}$}
@@ -45,19 +44,15 @@
             \EndIf\label{begin:scoreifend}
             \ensures{$a = s_b[i-id] \Leftrightarrow Score = 0$}
             \ensures{$a \neq s_b[i-id] \Leftrightarrow Score = 1$}
-            \Statex
             \State{$x \gets i + width - id \cdot 2$}\label{begin:x}
             \State{$cell\_d \gets d[x] + Score$}\label{begin:d}
             \State{$cell\_up \gets d[x - 1] + 1$}\label{begin:up}
             \State{$\mathit{cell\_left} \gets d[x + 1] + 1$}\label{begin:left}
-            \Statex
             \State{$d[x] \gets $\Call{minimum}{$cell\_up, \mathit{cell\_left}, cell\_d$}}\label{begin:write}
             \ensures{$d[x] = \textproc{minimum}(\Call{minimum}{d[x - 1], d[x + 1]} + 1, d[x] + Score)$}
-        %\Else
-        %    \State{\Call{barrier}{\relax}}
         \EndIf\label{begin:ifend}
     \EndFor\label{begin:forend}
 \EndProcedure
 \end{algorithmic}
-\end{multicols}
-\end{algorithm*}
+%\end{multicols}
+\end{algorithm}%*}

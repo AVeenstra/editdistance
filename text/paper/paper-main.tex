@@ -5,22 +5,38 @@
 \usepackage[table]{xcolor} % for grey cells in tables
 \usepackage{multicol}
 \usepackage{algorithm} % for pseudocode
-\usepackage[hidelinks,pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
-\usepackage[capitalise,noabbrev,nameinlink]{cleveref}
 \usepackage{algpseudocode} % for pseudocode
+\usepackage[pdfpagelabels=false,pageanchor=false]{hyperref} % to make references clickable
+\usepackage[capitalise,noabbrev,nameinlink]{cleveref}
 \usepackage[caption=false]{subfig} % for multiple figures in q1
 \usepackage{svg} % for svg images
 \usepackage{pgfplots} % graphs
 \usepackage{tabu} % awesome table
 \usepackage{float}
 \usepackage[outline]{contour}
+\usepackage{graphics}
+
+\crefname{line}{line}{lines}
+
+\makeatletter
+\newcounter{algorithmicH}% New algorithmic-like hyperref counter
+\let\oldalgorithmic\algorithmic
+\renewcommand{\algorithmic}{%
+  \stepcounter{algorithmicH}% Step counter
+  \oldalgorithmic}% Do what was always done with algorithmic environment
+\newcommand{\theHALG@line}{ALG@line.\thealgorithmicH.\arabic{ALG@line}}
+\DeclareRobustCommand{\crefnosort}[1]{%
+  \begingroup\@cref@sortfalse\cref{#1}\endgroup
+}
+\makeatother
+\newcommand{\creflastconjunction}{, and\nobreakspace}
 
 \pgfplotsset{compat=1.13}
 \pdfsuppresswarningpagegroup=1
 
 \contourlength{0.15em}
 
-\newcommand\todo[1]{\textcolor{red}{Todo: #1\ref*{:#1}}}
+\newcommand\todo[1]{\textcolor{red}{Todo: #1 \typeout{^^J^^J LaTeX Warning: Todo on page \thepage, undefined on input line \the\inputlineno.^^J^^J}}}
 
 %\def\NoNumber#1{{\def\alglinenumber##1{}\State #1}\addtocounter{ALG@line}{-1}}
 
@@ -38,6 +54,7 @@
 \algnewcommand\JML[1]{\State{{\color{jml}#1}}}
 \algnewcommand\JMLx[1]{\Statex{{\color{jml}#1}}}
 \algnewcommand\Forall[3]{\textbf{(\textbackslash{}forall} #1; #2; #3)}
+\algnewcommand\Forallx[3]{\textbf{(\textbackslash{}forall*} #1; #2; #3)}
 \algnewcommand\Or{\textbf{or}}
 \algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }%
 \algtext*{Indent}
@@ -47,7 +64,7 @@
 %\captionsetup[ContinuedFloat]{labelformat=cont}
 %\renewcommand\theContinuedFloat{\alph{ContinuedFloat}}
 
-\conferenceinfo{27$^{th}$ Twente Student Conference on IT}{Near future, 2017, Enschede, The Netherlands.}
+\conferenceinfo{27$^{th}$ Twente Student Conference on IT,}{July 7, 2017, Enschede, The Netherlands.}
 \CopyrightYear{2017}
 
 \title{Edit distance on GPU clusters using MPI}
@@ -85,7 +102,7 @@ The implementation is based on an existing verified single GPU implementation.
 The speed of the implementation is higher on a cluster, but the efficiency is affected by the overhead, which is caused by the extra communication between nodes.
 \end{abstract}
 
-\keywords{OpenCL, Edit distance problem, Levenshtein distance problem, GPU cluster, C++, case study, GPGPU program, MPI, Message Passing Interface}
+\keywords{OpenCL, MPI, Message Passing Interface, C++, Edit distance problem, Levenshtein distance problem, GPU cluster, GPGPU program, case study}
 
 \input{parts/introduction}
 

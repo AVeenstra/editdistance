@@ -131,35 +131,35 @@ For example, the $blocks\_num$ in \cref{division} equals $3$.
 The starting block is not counted as its computation will be combined with the next block.
 The variable $max\_height$ is equal to the maximum number of iterations a block will have.
 
-Block $G$ in \cref{division} depends on blocks $C$ and $D$, so the process handling block $G$ should get both most right columns of $C$ and $D$ before starting the calculation.
-Lines \ref{MPIalg_whileifbegin} to \ref{MPIalg_whileifend} retrieve the first column if the process is not handling the first pillar.
-Each iteration of the for loop retrieves another column in lines \ref{MPIalg_recvbegin} to \ref{MPIalg_recvend} before computing the block.
-This ensures that there are two columns in the queue before line \ref{MPIalg_executebegin} if the id of the process is not zero and if the process is not at the last block of the pillar.
+Block $G$ in \cref{division} depends on blocks $C$, $D$, and $F$, so the process handling block $G$ should get both most right columns of $C$ and $D$ before starting the calculation.
+\Crefrange{MPIalg_whileifbegin}{MPIalg_whileifend} retrieve the first column if the process is not handling the first pillar.
+Each iteration of the for loop retrieves another column in \crefrange{MPIalg_recvbegin}{MPIalg_recvend} before computing the block.
+This ensures that there are two columns in the queue before \cref{MPIalg_executebegin} if the id of the process is not zero and if the process is not at the last block of the pillar.
 At the last block of a pillar no column is received, since the last block depends on only one other block.
 For example, in \cref{division} block $H$ depends only on block $D$, given that the diagonals used in block $G$ are still in the memory.
 The first pillar does not require the retrieval of columns from other nodes, since \cref{fill_column} can be used to fill its column.
 
-Lines \ref{MPIalg_getabegin} and \ref{MPIalg_getaend} read a chunk of sequence $a$ starting from $column$ and store it in the memory of the GPU.
+\Cref{MPIalg_getabegin,MPIalg_getaend} read a chunk of sequence $a$ starting from $column$ and store it in the memory of the GPU.
 The size of this chunk is the number of characters read up to the $width$, so if there are not enough characters left in $s_a$ the width of the chunk is equal to $s_a\_length - column$.
 
-The for loop on lines \ref{MPIalg_forbegin} to \ref{MPIalg_forend} iterates through all the blocks of the pillar, where the first and second block are considered as one.
+The for loop on \crefrange{MPIalg_forbegin}{MPIalg_forend} iterates through all the blocks of the pillar, where the first and second block are considered as one.
 For example, in \cref{division} blocks $A$ and $B$ are considered as one.
-Lines \ref{MPIalg_recvbegin} to \ref{MPIalg_getheightend} retrieve the variables required to execute the kernel on line \ref{MPIalg_executebegin}.
-Lines \ref{MPIalg_sendbegin} to \ref{MPIalg_sendend} handle the result of the kernel.
+\Crefrange{MPIalg_recvbegin}{MPIalg_getheightend} retrieve the variables required to execute the kernel on \cref{MPIalg_executebegin}.
+\Crefrange{MPIalg_sendbegin}{MPIalg_sendend} handle the result of the kernel.
 
-As mentioned earlier, the if statement in lines \ref{MPIalg_recvbegin} through \ref{MPIalg_recvend} manages the retrieval of columns from other nodes.
-Line \ref{MPIalg_recv} is executed if the process is not dealing with the first pillar and if it is not computing the final block of a pillar.
+As mentioned earlier, the if statement in \crefrange{MPIalg_recvbegin}{MPIalg_recvend} manages the retrieval of columns from other nodes.
+\Cref{MPIalg_recv} is executed if the process is not dealing with the first pillar and if it is not computing the final block of a pillar.
 
-Lines \ref{MPIalg_getcolbegin} to \ref{MPIalg_getcolend} get a column if needed.
+\Crefrange{MPIalg_getcolbegin}{MPIalg_getcolend} get a column if needed.
 As mentioned before, the first pillar does not require a column from other nodes, so an empty list is used instead for the first pillar.
 
-Lines \ref{MPIalg_getheightbegin} to \ref{MPIalg_getheightend} get the height of the block which is to be processed.
+\Crefrange{MPIalg_getheightbegin}{MPIalg_getheightend} get the height of the block which is to be processed.
 Only the height of the last block of each pillar is smaller than the $max\_height$.
 
-On lines \ref{MPIalg_executebegin} to \ref{MPIalg_executeend} the kernel is executed and the result is saved.
-The function is defined on lines \ref{MPIalg_functionbegin} to \ref{MPIalg_functionend}.
+On \crefrange{MPIalg_executebegin}{MPIalg_executeend} the kernel is executed and the result is saved.
+The function is defined on \crefrange{MPIalg_functionbegin}{MPIalg_functionend}.
 
-Lines \ref{MPIalg_sendbegin} to \ref{MPIalg_sendend} handle the output of the kernel.
+\Crefrange{MPIalg_sendbegin}{MPIalg_sendend} handle the output of the kernel.
 If the process is not at the last pillar the column will be send to the next node.
 Again, the next node is the node with one id higher or, if no such node exists, the node with id zero.
 If the process is at the last block of the last pillar, the result of the problem can be found in the column.
@@ -167,29 +167,29 @@ This result is printed to the standard output.
 As mentioned before, MPI will handle the redirection of the output of a node to the output of the parent call.
 
 \subsubsection{Executing the kernel}
-The code on lines \ref{MPIalg_functionbegin} to \ref{MPIalg_functionend} shows the steps required to run the kernel.
+The code on \crefrange{MPIalg_functionbegin}{MPIalg_functionend} shows the steps required to run the kernel.
 The kernel will execute a combination of algorithms which can be found in \cref{algorithms}.
 %The combination depends on the $column$ and $block$ variables.
 In the first pillar \cref{fill_column} is first executed.
 In the first block of any pillar \cref{begin} is executed next.
 And at last \cref{block} is executed.
-Note that for the combination of blocks $A$ and $B$ of \cref{division} algorithms \ref{fill_column}, \ref{begin}, and \ref{block} will be executed.
+Note that for the combination of blocks $A$ and $B$ of \cref{division}, \crefnosort{fill_column,,begin,,block} will be executed.
 
-Lines \ref{MPIalg_functionifbegin} till \ref{MPIalg_functionifend} show what memory operations on the GPU are required to run kernel.
+\Crefrange{MPIalg_functionifbegin}{MPIalg_functionifend} show what memory operations on the GPU are required to run kernel.
 What memory operations are executed depend on which block is being processed.
-If it is not the first block, the array of the diagonals from the last run is moved to the start of the variable on line \ref{MPIalg_copymem}.
+If it is not the first block, the array of the diagonals from the last run is moved to the start of the variable on \cref{MPIalg_copymem}.
 Then the column retrieved from the previous node is written to the memory after the diagonals, where the column skips the first characters.
-This is done on line \ref{MPIalg_writecol1}.
+This is done on \cref{MPIalg_writecol1}.
 The number of characters skipped of this column is equal to the size of the width minus two.
-After that, the following column is also appended in the memory on line \ref{MPIalg_writecol2}.
+After that, the following column is also appended in the memory on \cref{MPIalg_writecol2}.
 The copying of the second column is required because the block being processed depends on two columns.
 
 If the process is at the first block of a pillar there is no need to copy the diagonals as the new block will be using \cref{begin}.
 Only the writing of the columns is necessary.
-This is done on lines \ref{MPIalg_writecol3} and \ref{MPIalg_writecol4}.
+This is done on \cref{MPIalg_writecol3,MPIalg_writecol4}.
 
 To keep the performance of the program decent, the number of blocks in a column should be at least 4, so that multiple blocks can be computed in parallel on multiple nodes.
-There is however a lower limit on the height of a block because of line \ref{MPIalg_copymem}.
+There is however a lower limit on the height of a block because of \cref{MPIalg_copymem}.
 If the diagonals at the end of a run overlap with the position where the diagonals are copied to, an error will be encountered.
 This can be solved by buffering the copy, but this brings too much overhead.
 As this only happens if the sequences are small, it is better to run the problem on a single node as \cref{testing} will point out.
@@ -197,5 +197,5 @@ That is why the program will simply refuse computing the edit distance between t
 It will not fall back to compute the problem on a single node to eliminate any confusion on how many nodes were actually used to solve the problem.
 
 The formula to compute the minimum sequence size is $2 \cdot diagonal\_size$.
-The $diagonal\_size$ is equal to $s_a.length \cdot 2 - 1$ as line \ref{MPIalg_diagonal_size} shows.
+The $diagonal\_size$ is equal to $s_a.length \cdot 2 - 1$ as \cref{MPIalg_diagonal_size} shows.
 The width of a pillar on one node used for testing was 1024, so sequences run on a cluster including that node will refuse any sequence size smaller than $2 \cdot (1024 \cdot 2 - 1) = 4094$.

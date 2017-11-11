@@ -8,23 +8,23 @@ A GPU on the other hand has a Single Instruction stream and Multiple Data stream
 The number of cores on a GPU is generally much higher than a CPU has, so a GPU can process more data in parallel using its SIMD architecture.
 
 One programming language allowing the developer to run programs on a GPU is OpenCL.
-OpenCL allows a developer to run a kernel on a GPU or CPU \cite{OpenCL}.
+OpenCL allows a developer to run a kernel on a GPU or CPU~\cite{OpenCL}.
 It is a low level programming language which can run on most GPUs and CPUs and allows general purpose parallel programming across both CPUs and GPUs.
-The traditional CPU based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3d graphics API such as OpenGL.
+The traditional CPU based programming models do not allow the same complex vector operations on GPUs as OpenCL offers without the need to translate their algorithms to a 3D graphics API such as OpenGL.
 As mentioned before, OpenCL is preferred over CUDA since the support of CUDA for GPUs and CPUs is limited to NVIDIA GPUs~\cite{CUDA}.
 
 In the OpenCL architecture one CPU based program call\-ed the \textit{Host} controls multiple GPUs and CPUs called \textit{Compute Devices}.
 Each of those \textit{Compute Devices} consists of one or more \textit{work-groups}, of which each contains one or more \textit{work-items}.
 These \textit{work-groups} execute the OpenCL kernels provided by the host program.
 Only before and after such kernel is running will the memory of the GPU be accessible to the \textit{Host}.
-Each \textit{work-item} has a unique identifier (id) to allow for different results, even though the same kernel runs on every \textit{work-item} \cite{OpenCL}.
+Each \textit{work-item} has a unique identifier (id) to allow for different results, even though the same kernel runs on every \textit{work-item}~\cite{OpenCL}.
 
 \begin{comment}
 The memory hierarchy used in OpenCL is not equal to that of the physical memory configuration on GPUs.
 This is to prevent having to take into account every type of architecture, which would be tedious work as the amount of types is quite large.
 Each of the architectural devices discussed above have their own memory, which is inaccessible to components of the same type.
 Every processing element can access its own private memory, the memory of its compute unit, the memory of its compute device.
-The host memory can be accessed, but it is generally slower than the on-board memory \cite{OpenCL}.
+The host memory can be accessed, but it is generally slower than the on-board memory~\cite{OpenCL}.
 
 The architecture and memory hierarchy already enforce the division of the algorithm if one wants to use every component of a GPU.
 \end{comment}
@@ -32,21 +32,21 @@ The architecture and memory hierarchy already enforce the division of the algori
 \subsection{MPI}
 MPI is a standard specification for communication between computers which enables parallel computing.
 It is comparable to the traditional forking of threads in C and its derivatives, but it adds additional communication and computation functions.
-Nodes can send and receive messages both asynchronous and synchronous, read and write memory on other nodes, read and write files on other nodes, compute simple mathematical operations on variables available on each node, and much more \cite{MPI}.
+Nodes can send and receive messages both asynchronous and synchronous, read and write memory on other nodes, read and write files on other nodes, compute simple mathematical operations on variables available on each node, and much more~\cite{MPI}.
 Each node runs the same program and has its own unique id, which is useful while dividing the workload among nodes.
 
 \subsection{Edit distance}\label{bed}
-The edit distance problem is way of measuring how much two strings differ from each other \cite{Navarro:2001:GTA:375360.375365}.
+The edit distance problem is way of measuring how much two strings differ from each other~\cite{Navarro:2001:GTA:375360.375365}.
 The distance is measured by the minimal number of operations like inserting, removing, replacing, and rearranging characters.
 One use for the distance is to find DNA or RNA subsequences after possible mutations.
-Another use offer suggestions for misspelled words, as words a shorter distance from the misspelled are more likely to be a correct replacement.
+Another use is to offer suggestions for misspelled words, as words with a shorter distance from the misspelled are more likely to be a correct replacement.
 
 The complexity of the algorithm depends on what operations are allowed and the cost of these operations in the implementation.
-In the existing implementation by De Heus \cite{Heus} and in the new implementation only inserting, removing, and replacing are considered.
+In the existing implementation by De~Heus~\cite{Heus} and in the new implementation only inserting, removing, and replacing are considered.
 The costs of all the operations is set to 1.
-The edit distance with those conditions is also called the Levenshtein distance \cite{Navarro:2001:GTA:375360.375365}.
+The edit distance with those conditions is also called the Levenshtein distance~\cite{Navarro:2001:GTA:375360.375365}.
 
-Take for example sequence $a$ ($s_a$) as ``kitten'' and sequence $b$ ($s_b$) as ``sitting''.
+For example, take sequence $a$ ($s_a$) as ``kitten'' and sequence~$b$ ($s_b$) as ``sitting''.
 The distance with the given conditions is equal to 3, since there are only 3 operations required to get from one sequence to the other.
 The operations required are:
 \begin{itemize}
@@ -56,16 +56,20 @@ The operations required are:
 \end{itemize}
 The order of the operations is not important, as long as it is the least amount of operations.
 
-As mentioned before, the edit distance problem has already been implemented on a single GPU by De Heus \cite{Heus}.
-His implementation also uses the Levenshtein distance and is used as base in \cref{originalalg}.
+As mentioned before, the edit distance problem has already been implemented on a single GPU by De Heus~\cite{Heus}.
+His implementation is used as base in \cref{originalalg}.
 As explained in \cref{compare}, the performance of the new implementation will not be compared to the performance of this single GPU implementation.
 
-\subsection{Verification}
+\subsection{Verification} \label{backver}
 Verification is done by describing what an algorithm requires as input and what it ensures as output.
-The language used is JML with an extension for Permission-based separation logic, which is used to guarantee no read and writes of memory occur at the same time~\cite{vercors}.
+The language used is JML with an extension for Permission-based separation logic.
+The Permission-based separation logic is used to guarantee no read and writes of memory occur at the same time~\cite{vercors}.
 The separation logic uses simple rules to define permissions on resources like locks do in multithreaded programs, but do not have any effect on the actual program.
-It is solely used to verify multithreaded programs, to guarantee no concurrent operations occur on resources. \todo{extend}
+It is used to verify multithreaded programs, to guarantee no concurrent resource access occurs.
 
 Permissions are claimed by using the $\textproc{Perm}(x, \pi)$ function, where $x$ is the memory address or memory range to claim and $\pi$ is the permissions required.
-In this paper $\pi$ is either $read$ or $write$, since no more complex constructions are required.
+The value of $\pi$ should be larger than 0 and no larger than 100.
+Any value between 0 and 100 grants read access to $x$, and a value of 100 grants write access.
+In this paper $\pi$ is either $read$ or $write$, where $read$ is an arbitrary value between 0 and 100 and $write$ equals 100.
+These two values should suffice, as no complex constructions are required in the verification.
 Multiple work-items can share a resource with the $read$ permission, but only one can use a resource with the $write$ permission.
