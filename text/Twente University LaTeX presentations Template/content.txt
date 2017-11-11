@@ -1,0 +1,13 @@
+Version 1.2: Updated the logo in the foot, now the language changes with the frontpage.
+
+Version 1.1: Update in sidebars and background, converted from PNG to PDF.
+
+Version 1.0: Initial Version.
+
+Contents:
+
+-UT.sty	The Twente University Style Sheet for LaTeX presentations
+-UT.tex The Twente University Tex file for creating presentations
+-UT.pdf The actual Twente University presentation in PDF format
+-/img	The image content for the presentations
+-/tex	The tex-files conent for the presentations
