@@ -1,0 +1,6 @@
+version=0.6.0
+typesetter=pdflatex
+steps=texpdf
+root=/home/veenstraaj/Documents/editdistance/text/presentation_advanced/presentation169.tex
+
+file=/home/veenstraaj/Documents/editdistance/text/presentation_advanced/content.tex
